@@ -223,6 +223,10 @@
     .jadwal-status-tag { font-family: var(--font-pixel); font-size: 5.5px; padding: 2px 5px; border-radius: 2px; font-weight: 700; white-space: nowrap; color: var(--bg-from); background: var(--primary); transition: background 0.2s ease, color 0.2s ease; }
     .jadwal-status-tag.offline { background: rgba(255,107,107,0.85); color: #2a0000; }
 
+    .jadwal-zoom-fixed-wrap {
+        position: relative;
+    }
+
     .jadwal-sheet-wrap {
         position: relative;
         border: 1px solid var(--glass-border);
@@ -243,6 +247,8 @@
     }
 
     /* ===== TOMBOL KACA PEMBESAR (MAGNIFY) ===== */
+    /* Sekarang tombol ada di luar area scroll (.jadwal-zoom-fixed-wrap), jadi
+       posisinya tetap diam di pojok kanan-atas walau tabel digeser kiri/kanan. */
     .jadwal-zoom-btn {
         position: absolute;
         top: 8px;
@@ -627,7 +633,10 @@
                     <span class="dot"></span><span class="st-text">Jadwal Dinas Bulan Ini</span>
                     <span class="jadwal-status-tag" id="jadwalStatusTag">LIVE</span>
                 </div>
-                <div class="jadwal-sheet-wrap" id="jadwalSheetWrap">
+                <div class="jadwal-zoom-fixed-wrap">
+                    <div class="jadwal-sheet-wrap" id="jadwalSheetWrap">
+                        <div id="jadwalSheetContainer"></div>
+                    </div>
                     <button type="button" class="jadwal-zoom-btn" onclick="openJadwalPage()" aria-label="Buka halaman jadwal lengkap" title="">
                         <svg viewBox="0 0 24 24" aria-hidden="true">
                             <circle cx="11" cy="11" r="7"></circle>
@@ -637,7 +646,6 @@
                         </svg>
                     </button>
                     <div class="jadwal-zoom-tooltip" role="tooltip">📅 Buka halaman jadwal lengkap</div>
-                    <div id="jadwalSheetContainer"></div>
                 </div>
             </div>
 
@@ -1262,11 +1270,14 @@ function getLaporan() {
         var items = [], counts = 0;
         sub.forEach(function (s) {
             var v = parseInt(document.getElementById(s.replace(/\s+/g, '-') + '-' + i).value) || 0;
-            if (v > 0) { items.push(v + ' orang (' + s + ')'); counts += v; }
+            if (v > 0) { items.push(s + ' : ' + v + ' orang'); counts += v; }
         });
         total += counts;
-        var ket = items.length > 0 ? ('\n                    - ' + items.join('\n                    - ')) : '\n                    - nihil';
-        detail += (i + 1) + '. ' + k.padEnd(14) + ':' + ket + '\n';
+        if (items.length > 0) {
+            detail += (i + 1) + '. ' + k + ' :\n    - ' + items.join('\n    - ') + '\n';
+        } else {
+            detail += (i + 1) + '. ' + k + ' : nihil\n';
+        }
     });
 
     return 'Kepada\nYth. Karumkit Tk. IV 12.07.03 Palangkaraya\n\n' + sf +
