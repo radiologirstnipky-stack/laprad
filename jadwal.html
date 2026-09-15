@@ -24,6 +24,7 @@
   .field-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
   label{display:block;font-size:.78rem;font-weight:700;color:#475569;margin-bottom:5px}
   select{width:100%;min-height:42px;border:1px solid var(--line);border-radius:9px;background:#fff;padding:8px 10px;color:var(--text)}
+  select:disabled{background:#f1f5f9;color:#94a3b8;cursor:not-allowed}
   .shift-row{display:grid;grid-template-columns:90px 1fr;align-items:center;gap:10px;margin:9px 0}
   .badge{font-size:.82rem;font-weight:800}
   .badge.p{color:#15803d}.badge.s{color:#a16207}.badge.m{color:#2563eb}
@@ -113,16 +114,27 @@
         <select id="excluded-person">
           <option value="">Tidak ada</option>
         </select>
-        <div class="muted" style="margin-top:5px">Nama tetap tampil di spreadsheet. Statusnya akan menjadi Libur atau Cuti sepanjang periode.</div>
+        <div class="muted" style="margin-top:5px">Nama tetap tampil di spreadsheet. Status pengecualian hanya berlaku pada rentang tanggal yang dipilih.</div>
       </div>
 
-      <div style="margin-top:10px">
-        <label for="excluded-status">Status pengecualian</label>
-        <select id="excluded-status">
-          <option value="L">Libur</option>
-          <option value="C">Cuti</option>
-        </select>
+      <div class="field-grid" style="margin-top:10px">
+        <div>
+          <label for="excluded-start">Dari tanggal</label>
+          <select id="excluded-start"></select>
+        </div>
+        <div>
+          <label for="excluded-end">Sampai tanggal</label>
+          <select id="excluded-end"></select>
+        </div>
+        <div>
+          <label for="excluded-status">Status pengecualian</label>
+          <select id="excluded-status">
+            <option value="L">Libur</option>
+            <option value="C">Cuti</option>
+          </select>
+        </div>
       </div>
+      <div class="muted" style="margin-top:5px">Contoh: 10–15 September → petugas berstatus Libur/Cuti hanya tanggal 10 sampai 15. Di luar rentang tersebut, pola dinas normal tetap berjalan.</div>
     </div>
 
     <div class="actions" style="grid-column:1/-1">
@@ -221,6 +233,7 @@ async function init(){
   document.querySelectorAll(".shift-select").forEach(s=>s.addEventListener("change",updateShiftSelects));
   m.addEventListener("change",updateDateDropdown);
   y.addEventListener("change",updateDateDropdown);
+  document.getElementById("excluded-person").addEventListener("change",updateExclusionControls);
 
   updateDateDropdown();
   updateShiftSelects();
@@ -287,6 +300,11 @@ function loadScheduleIntoPreview(data,fromCache=false){
 
   document.getElementById("excluded-person").value=data.excluded || "";
   document.getElementById("excluded-status").value=data.excludedStatus || "L";
+  updateExclusionControls();
+  if(data.excluded){
+    document.getElementById("excluded-start").value=data.excludedStart || data.refDate || 1;
+    document.getElementById("excluded-end").value=data.excludedEnd || data.excludedStart || data.refDate || 1;
+  }
 
   renderSchedule(data);
   document.getElementById("sync-status").textContent=fromCache
@@ -332,6 +350,28 @@ function updateDateDropdown(){
   if(current>days) current=days;
   sel.innerHTML="";
   for(let d=1;d<=days;d++) sel.add(new Option(`${d} ${monthNames[month]}`,d,false,d===current));
+  updateExclusionDateDropdowns(days);
+}
+
+function updateExclusionDateDropdowns(days){
+  const start=document.getElementById("excluded-start");
+  const end=document.getElementById("excluded-end");
+  const oldStart=+start.value || +document.getElementById("ref-date").value || 1;
+  const oldEnd=+end.value || oldStart;
+  start.innerHTML=""; end.innerHTML="";
+  for(let d=1;d<=days;d++){
+    start.add(new Option(`${d} ${monthNames[+document.getElementById("month").value]}`,d,false,d===Math.min(oldStart,days)));
+    end.add(new Option(`${d} ${monthNames[+document.getElementById("month").value]}`,d,false,d===Math.min(Math.max(oldEnd,Math.min(oldStart,days)),days)));
+  }
+  updateExclusionControls();
+}
+
+function updateExclusionControls(){
+  const hasExcluded=!!document.getElementById("excluded-person").value;
+  ["excluded-start","excluded-end","excluded-status"].forEach(id=>document.getElementById(id).disabled=!hasExcluded);
+  const start=document.getElementById("excluded-start");
+  const end=document.getElementById("excluded-end");
+  if(hasExcluded && +end.value < +start.value) end.value=start.value;
 }
 
 function updateShiftSelects(){
@@ -356,6 +396,8 @@ function generateSchedule(){
   const year=+document.getElementById("year").value;
   const excluded=document.getElementById("excluded-person").value;
   const excludedStatus=document.getElementById("excluded-status").value;
+  const excludedStart=excluded ? +document.getElementById("excluded-start").value : null;
+  const excludedEnd=excluded ? +document.getElementById("excluded-end").value : null;
   const selected=[
     document.getElementById("shift-pagi").value,
     document.getElementById("shift-sore").value,
@@ -365,6 +407,7 @@ function generateSchedule(){
   if(selected.some(v=>!v)){showToast("Mohon lengkapi petugas Pagi, Sore, dan Malam.");return;}
   if(new Set(selected).size!==3){showToast("Petugas pada Pagi, Sore, dan Malam harus berbeda.");return;}
   if(excluded && selected.includes(excluded)){showToast("Petugas yang dikecualikan tidak boleh dipilih sebagai petugas dinas.");return;}
+  if(excluded && (!excludedStart || !excludedEnd || excludedStart>excludedEnd)){showToast("Rentang tanggal pengecualian tidak valid.");return;}
 
   const daysInMonth=new Date(year,month+1,0).getDate();
   const refOffsets={};
@@ -381,6 +424,8 @@ function generateSchedule(){
     rows:[],
     excluded:excluded||null,
     excludedStatus:excluded?excludedStatus:null,
+    excludedStart:excluded?excludedStart:null,
+    excludedEnd:excluded?excludedEnd:null,
     updatedAt:new Date().toISOString()
   };
 
@@ -389,12 +434,11 @@ function generateSchedule(){
     const row={name,shifts:[]};
     for(let day=1;day<=daysInMonth;day++){
       let shift;
-      if(isExcluded){
+      const refOffset=refOffsets[name];
+      const day1Offset=(((refOffset-(refDate-1))%8)+8)%8;
+      shift=shiftPattern[(day1Offset+(day-1))%8];
+      if(isExcluded && day>=excludedStart && day<=excludedEnd){
         shift=excludedStatus;
-      }else{
-        const refOffset=refOffsets[name];
-        const day1Offset=(((refOffset-(refDate-1))%8)+8)%8;
-        shift=shiftPattern[(day1Offset+(day-1))%8];
       }
       row.shifts.push(shift);
     }
