@@ -27,6 +27,7 @@
         --amber:        #ffb445;
         --danger:       #ff6b6b;
         --info:         #5ac8ff;
+        --purple:       #c084fc;
         --radius-main:  20px;
         --radius-card:  14px;
         --radius-input: 8px;
@@ -48,7 +49,7 @@
         padding-top: calc(12px + env(safe-area-inset-top));
         padding-left: calc(12px + env(safe-area-inset-left));
         padding-right: calc(12px + env(safe-area-inset-right));
-        padding-bottom: calc(64px + env(safe-area-inset-bottom));
+        padding-bottom: calc(28px + env(safe-area-inset-bottom));
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
         position: relative;
@@ -78,7 +79,7 @@
     }
     .app-wrap::before { content: ''; position: absolute; top: 0; left: 5%; right: 5%; height: 1px; background: linear-gradient(90deg, transparent, var(--primary), transparent); }
 
-    @media (max-width: 380px) { .app-wrap { padding: 12px; } .form-section, .pasien-table-wrap { padding: 10px; margin-bottom: 10px; } .header-title { font-size: 0.98rem; } .dt-num { font-size: 1.55rem; } .photo-frame { max-width: 78px; } .jadwal-photo-frame { max-width: 56px; } .kategori-name { font-size: 0.62rem; } .sub-box { min-width: 70px; padding: 6px 4px; } .sub-label { font-size: 0.52rem; } .pc-btn { width: 20px; height: 20px; font-size: 0.8rem; } .pc-val { font-size: 0.68rem; } }
+    @media (max-width: 380px) { .app-wrap { padding: 12px; } .form-section, .pasien-table-wrap { padding: 10px; margin-bottom: 10px; } .header-title { font-size: 0.98rem; } .dt-num { font-size: 1.55rem; } .photo-frame { max-width: 58px; } .kategori-name { font-size: 0.62rem; } .kategori-total-badge { font-size: 0.56rem; padding: 2px 6px; } .sub-box { min-width: 70px; padding: 6px 4px; } .sub-label { font-size: 0.52rem; } .pc-btn { width: 20px; height: 20px; font-size: 0.8rem; } .pc-val { font-size: 0.68rem; } }
     @media (min-width: 1024px) {
         body { padding: 24px; align-items: center; }
         .app-wrap { max-width: 1680px; width: 96vw; padding: 32px 40px; margin: 0 auto; }
@@ -89,31 +90,14 @@
         .subtitle { font-size: 0.85rem; }
         .form-section, .pasien-table-wrap { padding: 20px; }
         .petugas-horizontal-container { grid-template-columns: 1fr auto 1fr; gap: 18px; }
-        /* Foto petugas memakai ukuran & rasio ASLI (real size) dari filenya
-           sendiri, ditampilkan 1/3 dari ukuran aslinya — dihitung lewat JS
-           (lihat applyRealPhotoSize()) begitu gambar selesai dimuat. Nilai
-           di bawah ini hanya fallback sebelum gambar termuat. Foto boleh
-           menyusut kalau ruang terbatas (max-width jadi batas atas, bukan
-           ukuran mutlak), tapi kotak UI (petugas-card) TIDAK ikut melebar. */
-        .photo-frame { width: 100%; max-width: 220px; aspect-ratio: 3 / 4; height: auto; }
-        .photo-slide img { object-fit: contain; }
-        .photo-nav-btn { width: 40px; height: 40px; font-size: 1.3rem; border-radius: 50%; }
-        .jadwal-photo-frame { max-width: 96px; }
+        .photo-frame { max-width: 96px; }
         .radio-widget { max-width: 92px; }
         .radio-bars { height: 24px; }
         .radio-digits { font-size: 1rem; }
         .shift-arrow-btn { width: 32px; height: 32px; font-size: 1.2rem; }
         .shift-value-display { font-size: 0.9rem; }
-        .jadwal-preview-grid { grid-template-columns: repeat(3, 1fr); gap: 12px; }
-        .jadwal-shift-card { padding: 12px 10px; gap: 8px; }
-        .jadwal-shift-name { font-size: 0.72rem; }
-        .jadwal-shift-badge { font-size: 0.7rem; padding: 2px 7px; }
-        .jadwal-shift-date { font-size: 0.72rem; }
-        .jadwal-shift-label { font-size: 7px; }
-        .jadwal-other-days { grid-template-columns: 1fr 1.5fr 1fr; gap: 12px; }
-        .jadwal-other-card { padding: 10px 8px; }
-        .jadwal-other-card .jadwal-shift-name { font-size: 0.65rem; }
-        .jadwal-other-card .jadwal-shift-badge { font-size: 0.6rem; padding: 2px 6px; }
+        .jadwal-sheet { font-size: 0.78rem; }
+        .jadwal-sheet th, .jadwal-sheet td { padding: 6px 8px; }
     }
     @media (min-width: 1440px) { .app-wrap { max-width: 1900px; } }
 
@@ -162,21 +146,16 @@
     .petugas-head-title { font-family: var(--font-pixel); font-size: clamp(6px, 1.5vw, 7.5px); color: var(--text-main); line-height: 1.2; }
     .petugas-badge { color: var(--bg-from); background: var(--primary); font-family: var(--font-pixel); font-size: 5.5px; padding: 2px 4px; border-radius: 2px; font-weight: bold; }
     .petugas-body { display: flex; flex-direction: column; gap: 7px; align-items: center; }
-    .photo-frame { position: relative; width: 100%; min-width: 0; max-width: 96px; aspect-ratio: 9 / 16; border: 1px solid var(--primary-dark); border-radius: 4px; overflow: hidden; background: radial-gradient(circle at 50% 30%, rgba(89,255,166,0.12), transparent 70%), #031209; flex-shrink: 1; transition: border-color 0.2s ease, box-shadow 0.2s ease; }
+    .photo-frame { position: relative; width: 100%; max-width: 68px; aspect-ratio: 3 / 4; border: 1px solid var(--primary-dark); border-radius: 4px; overflow: hidden; background: radial-gradient(circle at 50% 30%, rgba(89,255,166,0.12), transparent 70%), #031209; flex-shrink: 0; cursor: pointer; transition: border-color 0.2s ease, box-shadow 0.2s ease; }
+    .photo-frame:hover, .photo-frame:active { border-color: var(--primary); box-shadow: 0 0 10px rgba(89,255,166,0.35); }
     .photo-frame.libur { border-color: var(--danger); box-shadow: 0 0 15px rgba(255,107,107,0.3); }
     .photo-frame.libur .corner { border-color: var(--danger); }
-    .photo-frame.photo-settled { border-color: var(--primary); box-shadow: 0 0 14px rgba(89,255,166,0.55), 0 0 28px rgba(89,255,166,0.25), inset 0 0 10px rgba(89,255,166,0.08); }
-    .photo-frame.photo-settled .corner { border-color: var(--glow); }
-    .photo-switcher { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 6px; width: 100%; min-width: 0; }
-    .photo-nav-btn { flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--glass-border); background: rgba(89,255,166,0.12); color: var(--primary); font-size: 1.05rem; font-weight: 700; line-height: 1; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.15s ease, transform 0.1s ease, border-color 0.15s ease; }
-    .photo-nav-btn:hover { background: rgba(89,255,166,0.24); border-color: var(--primary); }
-    .photo-nav-btn:active { transform: scale(0.86); background: rgba(89,255,166,0.35); }
-    .photo-track-viewport { position: absolute; inset: 0; overflow: hidden; border-radius: 4px; }
-    .photo-track { display: flex; width: 100%; height: 100%; transition: transform 0.38s cubic-bezier(0.4,0,0.2,1); will-change: transform; }
-    .photo-slide { position: relative; flex: 0 0 100%; width: 100%; height: 100%; }
-    .photo-slide img { width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0.9; filter: grayscale(1) sepia(1) hue-rotate(65deg) saturate(3) brightness(0.8); }
+    .petugas-native-select { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; z-index: 6; cursor: pointer; appearance: none; -webkit-appearance: none; border: none; background: transparent; padding: 0; }
     .petugas-name-label { width: 100%; text-align: center; font-family: var(--font-mono); font-size: 0.7rem; font-weight: 700; color: var(--text-main); line-height: 1.25; word-break: break-word; }
     .petugas-name-label.libur { color: var(--danger); }
+    .petugas-tap-hint { width: 100%; text-align: center; font-size: 0.58rem; color: var(--text-muted); letter-spacing: 0.3px; margin-top: -4px; }
+    .photo-frame img { width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0.9; filter: grayscale(1) sepia(1) hue-rotate(65deg) saturate(3) brightness(0.8); }
+    .photo-frame.libur img { filter: grayscale(0.5) sepia(0.5) hue-rotate(340deg) saturate(2) brightness(0.6); }
     .photo-placeholder { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: var(--primary-dark); }
     .photo-placeholder svg { width: 32%; opacity: 0.6; }
     .photo-placeholder small { font-family: var(--font-pixel); font-size: 5px; letter-spacing: 0.5px; }
@@ -207,27 +186,28 @@
     @keyframes barPulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
     .radio-digits { font-family: var(--font-display); font-size: 0.82rem; font-weight: 700; letter-spacing: 1px; color: var(--primary); text-shadow: 0 0 6px rgba(89,255,166,0.6); }
 
-    /* ===== WIDGET JADWAL DINAS BARU (seperti kotak petugas) ===== */
+    /* ===== WIDGET JADWAL DINAS — SPREADSHEET ===== */
     .jadwal-widget .section-title { margin-bottom: 10px; }
     .jadwal-status-tag { font-family: var(--font-pixel); font-size: 5.5px; padding: 2px 5px; border-radius: 2px; font-weight: 700; white-space: nowrap; color: var(--bg-from); background: var(--primary); transition: background 0.2s ease, color 0.2s ease; }
     .jadwal-status-tag.offline { background: rgba(255,107,107,0.85); color: #2a0000; }
 
-    .jadwal-preview-container {
+    .jadwal-sheet-wrap {
         position: relative;
         border: 1px solid var(--glass-border);
         border-radius: var(--radius-card);
-        background: rgba(89,255,166,0.02);
-        padding: 10px;
+        background: rgba(1, 8, 4, 0.7);
+        padding: 12px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        max-height: 70vh;
         cursor: pointer;
-        transition: all 0.25s ease;
-        overflow: hidden;
+        transition: border-color 0.25s ease, box-shadow 0.25s ease;
     }
-    .jadwal-preview-container:hover {
+    .jadwal-sheet-wrap:hover {
         border-color: var(--primary);
         box-shadow: 0 0 20px rgba(89,255,166,0.15);
-        background: rgba(89,255,166,0.05);
     }
-    .jadwal-preview-container .hover-overlay {
+    .jadwal-sheet-wrap .hover-overlay {
         position: absolute;
         inset: 0;
         background: rgba(1,6,3,0.75);
@@ -242,9 +222,7 @@
         pointer-events: none;
         z-index: 10;
     }
-    .jadwal-preview-container:hover .hover-overlay {
-        opacity: 1;
-    }
+    .jadwal-sheet-wrap:hover .hover-overlay { opacity: 1; }
     .hover-overlay span {
         font-family: var(--font-pixel);
         font-size: clamp(5px, 1.5vw, 8px);
@@ -258,368 +236,96 @@
         text-shadow: 0 0 12px rgba(89,255,166,0.4);
     }
 
-    /* Grid untuk shift hari ini - 3 kolom seperti petugas */
-    .jadwal-preview-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 6px;
-        position: relative;
-        z-index: 1;
-        margin-bottom: 10px;
-    }
-
-    /* Setiap shift seperti kotak petugas */
-    .jadwal-shift-card {
-        border: 1px solid var(--glass-border);
-        border-radius: var(--radius-card);
-        background: rgba(89,255,166,0.02);
-        padding: 6px 4px;
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-        min-width: 0;
-        transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-    .jadwal-shift-card:hover {
-        border-color: rgba(89,255,166,0.4);
-    }
-    .jadwal-shift-card.jadwal-shift-active {
-        position: relative;
-        border-color: var(--amber);
-        box-shadow: 0 0 12px rgba(255,180,69,0.28), inset 0 0 8px rgba(255,180,69,0.1);
-        background: rgba(255,180,69,0.06);
-    }
-    .jadwal-shift-card.jadwal-shift-inactive {
-        opacity: 0.55;
-        background: rgba(255,255,255,0.015);
-        border-color: rgba(255,255,255,0.08);
-    }
-    .jadwal-shift-card.jadwal-shift-inactive:hover {
-        border-color: rgba(255,255,255,0.18);
-    }
-    .jadwal-active-arrow {
-        display: block;
+    /* Gaya Spreadsheet */
+    .sheet-title {
         text-align: center;
-        font-size: 11px;
-        line-height: 1;
-        color: var(--amber);
-        text-shadow: 0 0 8px rgba(255,180,69,0.8);
-        animation: arrowBlink 1s ease-in-out infinite;
-        margin-bottom: 2px;
-    }
-    @keyframes arrowBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.15; } }
-    .jadwal-shift-card.jadwal-shift-libur {
-        border-color: var(--danger);
-        background: rgba(255,107,107,0.05);
-    }
-    .jadwal-shift-card.jadwal-shift-libur .jadwal-shift-head .jadwal-shift-label {
-        color: var(--danger);
-    }
-
-    .jadwal-shift-head {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 2px;
-        border-bottom: 1px dashed rgba(89,255,166,0.15);
-        padding-bottom: 4px;
-        text-align: center;
-    }
-    .jadwal-shift-label {
-        font-family: var(--font-pixel);
-        font-size: clamp(5px, 1.4vw, 6.5px);
+        font-family: var(--font-display);
+        font-size: 1.1rem;
+        font-weight: 700;
         color: var(--text-main);
-        letter-spacing: 0.4px;
-        line-height: 1.4;
+        margin-bottom: 4px;
+        letter-spacing: 1px;
     }
-    .jadwal-shift-active .jadwal-shift-label { color: var(--amber); }
-    .jadwal-shift-date {
+    .sheet-subtitle {
+        text-align: center;
         font-family: var(--font-mono);
-        font-size: 0.55rem;
+        font-size: 0.68rem;
         color: var(--text-muted);
-        font-weight: 700;
-    }
-
-    .jadwal-shift-body {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 4px;
-    }
-
-    /* Mini photo frame di dalam shift card */
-    .jadwal-photo-frame {
-        position: relative;
-        width: 100%;
-        max-width: 72px;
-        aspect-ratio: 9 / 16;
-        border: 1px solid var(--primary-dark);
-        border-radius: 4px;
-        overflow: hidden;
-        background: radial-gradient(circle at 50% 30%, rgba(89,255,166,0.12), transparent 70%), #031209;
-        flex-shrink: 0;
-        transition: border-color 0.2s ease, box-shadow 0.2s ease;
-        margin: 0 auto;
-    }
-    .jadwal-photo-frame.jadwal-libur-frame {
-        border-color: var(--danger);
-        box-shadow: 0 0 12px rgba(255,107,107,0.25);
-    }
-    .jadwal-photo-frame.jadwal-libur-frame .corner {
-        border-color: var(--danger);
-    }
-    .jadwal-photo-frame img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-        opacity: 0.9;
-        filter: grayscale(1) sepia(1) hue-rotate(65deg) saturate(3) brightness(0.8);
-    }
-    .jadwal-photo-frame.jadwal-libur-frame img {
-        filter: grayscale(0.5) sepia(0.5) hue-rotate(340deg) saturate(2) brightness(0.6);
-    }
-    /* Petugas yang sedang bertugas saat ini: glow kuning pulsing + logo radiasi */
-    @keyframes jadwalActiveGlow {
-        0%, 100% { box-shadow: 0 0 6px rgba(255,180,69,0.5), 0 0 0px rgba(255,180,69,0); border-color: var(--amber); }
-        50% { box-shadow: 0 0 20px rgba(255,180,69,0.95), 0 0 32px rgba(255,180,69,0.6); border-color: #ffe0a3; }
-    }
-    .jadwal-photo-frame.jadwal-photo-active {
-        animation: jadwalActiveGlow 1.6s ease-in-out infinite;
-        z-index: 1;
-    }
-    .jadwal-photo-frame.jadwal-photo-active .corner {
-        border-color: #ffe0a3;
-    }
-    .jadwal-photo-frame .radiasi-icon {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%) scale(0.9);
-        font-size: 22px;
-        color: var(--amber);
-        text-shadow: 0 0 10px rgba(255,180,69,0.9), 0 0 20px rgba(255,180,69,0.5);
-        opacity: 0.6;
-        pointer-events: none;
-        z-index: 3;
-        animation: radiasiPulse 1.6s ease-in-out infinite;
-    }
-    @keyframes radiasiPulse {
-        0%, 100% { opacity: 0.45; transform: translate(-50%, -50%) scale(0.85); }
-        50% { opacity: 0.9; transform: translate(-50%, -50%) scale(1.08); }
-    }
-    /* Petugas yang tidak sedang dinas saat ini (sebelum/sesudah shift aktif): grey + transparan */
-    .jadwal-photo-frame.jadwal-photo-inactive {
-        border-color: rgba(190,200,195,0.3);
-        opacity: 0.5;
-    }
-    .jadwal-photo-frame.jadwal-photo-inactive img {
-        filter: grayscale(1) brightness(0.55) !important;
-    }
-    .jadwal-photo-frame.jadwal-photo-inactive .corner {
-        border-color: rgba(190,200,195,0.45);
-    }
-    .jadwal-photo-frame .photo-placeholder-mini {
-        position: absolute;
-        inset: 0;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        color: var(--primary-dark);
-    }
-    .jadwal-photo-frame .photo-placeholder-mini svg {
-        width: 30%;
-        opacity: 0.5;
-    }
-    .jadwal-photo-frame .photo-placeholder-mini small {
-        font-family: var(--font-pixel);
-        font-size: 4px;
-        letter-spacing: 0.3px;
-    }
-    .jadwal-photo-frame .scan-overlay-mini {
-        position: absolute;
-        inset: 0;
-        pointer-events: none;
-        mix-blend-mode: multiply;
-        background: repeating-linear-gradient(0deg, rgba(0,0,0,0.2) 0px, rgba(0,0,0,0.2) 1px, transparent 2px, transparent 4px);
-    }
-    .jadwal-photo-frame .corner {
-        position: absolute;
-        width: 5px;
-        height: 5px;
-        border: 1px solid var(--primary);
-        opacity: 0.7;
-    }
-    .jadwal-photo-frame .corner.tl { top: -1px; left: -1px; border-right: none; border-bottom: none; }
-    .jadwal-photo-frame .corner.tr { top: -1px; right: -1px; border-left: none; border-bottom: none; }
-    .jadwal-photo-frame .corner.bl { bottom: -1px; left: -1px; border-right: none; border-top: none; }
-    .jadwal-photo-frame .corner.br { bottom: -1px; right: -1px; border-left: none; border-top: none; }
-    .jadwal-photo-frame .shift-chip-mini {
-        position: absolute;
-        bottom: 2px;
-        left: 2px;
-        right: 2px;
-        font-family: var(--font-pixel);
-        font-size: 4.5px;
-        text-align: center;
-        background: rgba(1,6,3,0.9);
-        border: 1px solid var(--primary-dark);
-        padding: 1px 2px;
-        color: var(--glow);
-    }
-    .jadwal-photo-frame.jadwal-libur-frame .shift-chip-mini {
-        border-color: var(--danger);
-        color: var(--danger);
-    }
-
-    .jadwal-shift-name {
-        width: 100%;
-        text-align: center;
-        font-family: var(--font-mono);
-        font-size: 0.6rem;
-        font-weight: 700;
-        color: var(--text-main);
-        line-height: 1.2;
-        word-break: break-word;
-        min-height: 1.8em;
-    }
-    .jadwal-shift-name.libur {
-        color: var(--danger);
-    }
-    .jadwal-shift-badge-mini {
-        display: inline-block;
-        font-family: var(--font-mono);
-        font-weight: 800;
-        font-size: 0.5rem;
-        padding: 1px 5px;
-        border-radius: 4px;
-        text-align: center;
-        border: 1px solid transparent;
-        margin-top: 2px;
-    }
-    .jadwal-shift-badge-mini.sb-P { background: rgba(89,255,166,0.16); color: var(--primary); border-color: rgba(89,255,166,0.4); }
-    .jadwal-shift-badge-mini.sb-S { background: rgba(255,180,69,0.16); color: var(--amber); border-color: rgba(255,180,69,0.4); }
-    .jadwal-shift-badge-mini.sb-M { background: rgba(90,200,255,0.16); color: var(--info); border-color: rgba(90,200,255,0.4); }
-    .jadwal-shift-badge-mini.sb-L { background: rgba(255,107,107,0.16); color: var(--danger); border-color: rgba(255,107,107,0.4); }
-
-    /* Status kehadiran real-time (mengikuti jam dinas & saklar Sedang Keluar/Di
-       Tempat dari jadwal.html), ditampilkan di bawah badge shift P/S/M. */
-    .jadwal-status-pill {
-        display: inline-flex;
-        align-items: center;
-        gap: 3px;
-        font-family: var(--font-mono);
-        font-weight: 700;
-        font-size: 0.46rem;
-        letter-spacing: 0.03em;
-        padding: 1px 6px;
-        border-radius: 999px;
-        text-align: center;
-        border: 1px solid transparent;
-        margin-top: 3px;
+        margin-bottom: 12px;
+        letter-spacing: 1.5px;
         text-transform: uppercase;
-        white-space: nowrap;
     }
-    .jadwal-status-pill .dot { width: 4px; height: 4px; border-radius: 50%; flex-shrink: 0; }
-    .jadwal-status-pill.js-duty { background: rgba(89,255,166,0.14); color: var(--primary); border-color: rgba(89,255,166,0.4); }
-    .jadwal-status-pill.js-duty .dot { background: var(--primary); box-shadow: 0 0 4px var(--primary); }
-    .jadwal-status-pill.js-out { background: rgba(255,180,69,0.16); color: var(--amber); border-color: rgba(255,180,69,0.4); }
-    .jadwal-status-pill.js-out .dot { background: var(--amber); box-shadow: 0 0 4px var(--amber); }
-    .jadwal-status-pill.js-off { background: rgba(185,255,221,0.06); color: var(--text-muted); border-color: var(--glass-border); }
-    .jadwal-status-pill.js-off .dot { background: var(--text-muted); }
 
-    /* Jadwal kemarin, besok, lusa di bawah — kolom "besok" dibuat lebih lebar
-       supaya lebih mudah dilihat dibanding jadwal kemarin/lusa. */
-    .jadwal-other-days {
-        display: grid;
-        grid-template-columns: 1fr 1.5fr 1fr;
-        gap: 6px;
-        padding-top: 8px;
-        border-top: 1px dashed rgba(89,255,166,0.15);
-        position: relative;
-        z-index: 1;
-    }
-    .jadwal-other-card.jadwal-besok-highlight {
-        border-color: var(--primary);
-        background: rgba(89,255,166,0.07);
-        box-shadow: 0 0 14px rgba(89,255,166,0.2), inset 0 0 8px rgba(89,255,166,0.08);
-        padding: 7px 6px;
-    }
-    .jadwal-other-card.jadwal-besok-highlight .jadwal-shift-label {
-        color: var(--primary);
-        font-size: clamp(5.5px, 1.5vw, 7px);
-    }
-    .jadwal-other-card.jadwal-besok-highlight .jadwal-shift-date {
-        font-size: 0.6rem;
+    .jadwal-sheet {
+        border-collapse: collapse;
+        width: 100%;
+        font-size: 11px;
+        font-family: var(--font-mono);
         color: var(--text-main);
+        table-layout: fixed; /* Menjaga lebar kolom agar rapi */
     }
-    .jadwal-other-card.jadwal-besok-highlight .jadwal-shift-name {
-        font-size: 0.62rem;
+    .jadwal-sheet th,
+    .jadwal-sheet td {
+        border: 1px solid rgba(89,255,166,0.15);
+        text-align: center;
+        padding: 6px 4px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
-    .jadwal-other-card.jadwal-besok-highlight .jadwal-shift-badge-mini {
-        font-size: 0.52rem;
-        padding: 1px 6px;
+    .jadwal-sheet th {
+        background: rgba(89,255,166,0.12);
+        font-weight: 800;
+        color: var(--primary);
+        position: sticky;
+        top: 0;
+        z-index: 2;
     }
-    .jadwal-other-card {
-        border: 1px solid var(--glass-border);
-        border-radius: var(--radius-card);
-        background: rgba(89,255,166,0.02);
-        padding: 5px 4px;
-        display: flex;
-        flex-direction: column;
-        gap: 3px;
-        min-width: 0;
+    .jadwal-sheet th.name-head {
+        left: 0;
+        z-index: 4;
+        background: rgba(89,255,166,0.18);
+        text-align: left;
+        min-width: 180px;
+        max-width: 200px;
     }
-    .jadwal-other-card .jadwal-shift-head {
-        padding-bottom: 3px;
-        margin-bottom: 3px;
+    .jadwal-sheet td.name {
+        position: sticky;
+        left: 0;
+        background: rgba(1, 12, 6, 0.95);
+        text-align: left;
+        font-weight: 800;
+        z-index: 1;
+        min-width: 180px;
+        max-width: 200px;
+        color: var(--text-main);
+        border-right: 2px solid rgba(89,255,166,0.3);
     }
-    .jadwal-other-card .jadwal-shift-label {
-        font-size: clamp(4.5px, 1.2vw, 5.5px);
-    }
-    .jadwal-other-card .jadwal-shift-date {
-        font-size: 0.5rem;
-    }
-    .jadwal-other-card .jadwal-shift-name {
-        font-size: 0.5rem;
-        min-height: 1.4em;
-    }
-    .jadwal-other-card .jadwal-shift-badge-mini {
-        font-size: 0.42rem;
-        padding: 0px 4px;
-    }
-    .jadwal-other-card .jadwal-shift-item {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 3px;
-        padding: 1px 3px;
-        border-radius: 3px;
-        background: rgba(89,255,166,0.04);
-        border-left: 2px solid transparent;
-    }
-    .jadwal-other-card .jadwal-shift-item.libur {
-        border-left-color: var(--danger);
-        background: rgba(255,107,107,0.08);
-    }
-    .jadwal-other-card .jadwal-shift-item.libur .jadwal-shift-name {
-        color: var(--danger);
-        font-weight: 700;
+
+    /* Warna Shift untuk Sel */
+    .jadwal-sheet .bg-P { background: rgba(255, 180, 69, 0.2); color: #ffb445; font-weight: 800; }
+    .jadwal-sheet .bg-S { background: rgba(255, 107, 107, 0.2); color: #ff6b6b; font-weight: 800; }
+    .jadwal-sheet .bg-M { background: rgba(89, 255, 166, 0.2); color: #59ffa6; font-weight: 800; }
+    .jadwal-sheet .bg-L { background: rgba(90, 200, 255, 0.2); color: #5ac8ff; font-weight: 800; }
+    .jadwal-sheet .bg-C { background: rgba(192, 132, 252, 0.2); color: #c084fc; font-weight: 800; }
+
+    /* Header Akhir Pekan */
+    .jadwal-sheet .weekend-sat { background: rgba(255, 180, 69, 0.15); color: #ffb445; }
+    .jadwal-sheet .weekend-sun { background: rgba(255, 107, 107, 0.15); color: #ff6b6b; }
+
+    .jadwal-sheet-empty {
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 0.78rem;
+        padding: 24px 0;
     }
 
     @media (max-width: 380px) {
-        .jadwal-preview-grid { gap: 4px; }
-        .jadwal-shift-card { padding: 4px 3px; gap: 3px; }
-        .jadwal-photo-frame { max-width: 56px; }
-        .jadwal-shift-name { font-size: 0.5rem; min-height: 1.5em; }
-        .jadwal-shift-badge-mini { font-size: 0.42rem; padding: 0px 3px; }
-        .jadwal-shift-date { font-size: 0.48rem; }
-        .jadwal-shift-label { font-size: 4.5px; }
-        .jadwal-other-days { gap: 4px; }
-        .jadwal-other-card { padding: 4px 3px; }
-        .jadwal-other-card .jadwal-shift-name { font-size: 0.42rem; }
-        .jadwal-other-card .jadwal-shift-badge-mini { font-size: 0.38rem; padding: 0px 2px; }
+        .jadwal-sheet { font-size: 9px; }
+        .jadwal-sheet th, .jadwal-sheet td { padding: 4px 2px; }
+        .jadwal-sheet th.name-head, .jadwal-sheet td.name { min-width: 120px; max-width: 140px; font-size: 9px; }
+        .sheet-title { font-size: 0.9rem; }
+        .sheet-subtitle { font-size: 0.55rem; }
     }
 
     .pasien-table-wrap { padding: 14px; }
@@ -628,6 +334,7 @@
     .kategori-card:hover { border-color: rgba(89,255,166,0.4); }
     .kategori-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px dashed rgba(89,255,166,0.15); }
     .kategori-name { font-size: 0.68rem; font-weight: 700; color: var(--text-main); line-height: 1.2; word-break: break-word; }
+    .kategori-total-badge { flex-shrink: 0; white-space: nowrap; font-family: var(--font-mono); font-weight: 800; font-size: 0.62rem; color: var(--bg-from); background: var(--primary); padding: 3px 8px; border-radius: 20px; }
     .sub-grid { display: flex; flex-wrap: wrap; gap: 6px; }
     .sub-box { flex: 1 1 45%; min-width: 82px; background: rgba(89,255,166,0.04); border: 1px solid rgba(89,255,166,0.15); border-radius: 8px; padding: 7px 6px; display: flex; flex-direction: column; align-items: center; gap: 5px; }
     .sub-box.sub-box-wide { flex: 1 1 100%; }
@@ -641,6 +348,7 @@
         .kategori-list { gap: 12px; }
         .kategori-card { padding: 14px 16px; }
         .kategori-name { font-size: 0.82rem; }
+        .kategori-total-badge { font-size: 0.72rem; padding: 4px 10px; }
         .sub-grid { gap: 10px; }
         .sub-box { flex-basis: 22%; min-width: 110px; padding: 10px 8px; }
         .sub-label { font-size: 0.64rem; }
@@ -655,11 +363,6 @@
     a.action-btn { display: flex; align-items: center; justify-content: center; text-decoration: none; text-align: center; }
     .action-btn:active { transform: scale(0.97); filter: brightness(0.9); }
     .btn-copy { background: linear-gradient(135deg, var(--primary), #32cb75); box-shadow: 0 4px 14px rgba(89,255,166,0.3); }
-    @keyframes copyPulseGlow {
-        0%, 100% { box-shadow: 0 4px 14px rgba(89,255,166,0.3); transform: scale(1); }
-        50% { box-shadow: 0 4px 28px rgba(89,255,166,0.9), 0 0 40px rgba(89,255,166,0.5); transform: scale(1.015); }
-    }
-    .btn-copy.pulse-glow { animation: copyPulseGlow 1.2s ease-in-out infinite; }
     .btn-wa { background: linear-gradient(135deg, #25d366, #128c46); color: #fff; box-shadow: 0 4px 14px rgba(37,211,102,0.3); }
     .btn-link { background: rgba(89,255,166,0.1); color: var(--text-main); border: 1px solid var(--glass-border); box-shadow: none; }
     .btn-link:hover { background: rgba(89,255,166,0.18); }
@@ -715,45 +418,6 @@
     @keyframes dtPulse { 0% { box-shadow: 0 0 0 0 rgba(89,255,166,0.6); } 70% { box-shadow: 0 0 0 6px rgba(89,255,166,0); } 100% { box-shadow: 0 0 0 0 rgba(89,255,166,0); } }
     .dt-edit-hint { font-size: 0.63rem; color: rgba(217,255,233,0.5); }
     .dt-live-btn { position: relative; z-index: 10; pointer-events: auto; background: rgba(255,180,69,0.15); border: 1px solid rgba(255,180,69,0.35); color: var(--amber); font-family: var(--font-mono); font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 6px; cursor: pointer; }
-
-    /* ===== ROLLING TEXT / TICKER BAWAH (tampil di atas seluruh layout) ===== */
-    .rolling-ticker {
-        position: fixed;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        z-index: 999999;
-        height: 34px;
-        display: flex;
-        align-items: center;
-        overflow: hidden;
-        background: rgba(1,10,5,0.92);
-        border-top: 1px solid var(--glass-border);
-        box-shadow: 0 -4px 18px rgba(0,0,0,0.5), 0 -1px 0 rgba(89,255,166,0.15);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        padding-bottom: env(safe-area-inset-bottom);
-    }
-    .rolling-ticker-track {
-        display: flex;
-        width: max-content;
-        white-space: nowrap;
-        font-family: var(--font-mono);
-        font-size: 0.74rem;
-        font-weight: 700;
-        letter-spacing: 0.4px;
-        color: var(--primary);
-        text-shadow: 0 0 8px rgba(89,255,166,0.4);
-        animation: tickerScroll 26s linear infinite;
-    }
-    .rolling-ticker-track .ticker-item { padding-right: 70px; }
-    @keyframes tickerScroll {
-        from { transform: translateX(0); }
-        to { transform: translateX(-50%); }
-    }
-    @media (min-width: 1024px) {
-        .rolling-ticker-track { font-size: 0.85rem; }
-    }
 </style>
 </head>
 <body>
@@ -762,13 +426,6 @@
 <div class="stars-layer"><canvas id="starCanvas"></canvas></div>
 <div class="nebula"></div>
 <div class="crt-overlay"></div>
-
-<div class="rolling-ticker" aria-hidden="true">
-    <div class="rolling-ticker-track">
-        <span class="ticker-item">&#9888; Harap ruangan dijaga tetap bersih dan aman, petugas yang berganti dinas diharapkan untuk mengirim konsul bacaan ke grup radiologi rumah sakit. :)</span>
-        <span class="ticker-item">&#9888; Harap ruangan dijaga tetap bersih dan aman, petugas yang berganti dinas diharapkan untuk mengirim konsul bacaan ke grup radiologi rumah sakit. :)</span>
-    </div>
-</div>
 
 <div id="toastNotif" class="toast-notification"><span>✓ Laporan Berhasil Disalin!</span></div>
 
@@ -865,16 +522,15 @@
                 </div>
             </div>
 
-            <!-- WIDGET JADWAL DINAS - SEPERTI KOTAK PETUGAS -->
+            <!-- WIDGET JADWAL DINAS — SPREADSHEET -->
             <div class="form-section jadwal-widget" id="jadwalWidget">
                 <div class="section-title">
-                    <span class="dot"></span><span class="st-text">Jadwal Dinas Hari Ini</span>
+                    <span class="dot"></span><span class="st-text">Jadwal Dinas Bulan Ini</span>
                     <span class="jadwal-status-tag" id="jadwalStatusTag">LIVE</span>
                 </div>
-                <div class="jadwal-preview-container" id="jadwalPreviewContainer" onclick="openJadwalPage()">
-                    <div class="hover-overlay"><span>📅 Klik untuk lihat jadwal bulan ini</span></div>
-                    <div class="jadwal-preview-grid" id="jadwalPreviewGrid"></div>
-                    <div class="jadwal-other-days" id="jadwalOtherDays"></div>
+                <div class="jadwal-sheet-wrap" id="jadwalSheetWrap" onclick="openJadwalPage()">
+                    <div class="hover-overlay"><span>📅 Klik untuk buka halaman jadwal lengkap</span></div>
+                    <div id="jadwalSheetContainer"></div>
                 </div>
             </div>
 
@@ -887,26 +543,30 @@
                             <span class="petugas-badge">MENYERAHKAN</span>
                         </div>
                         <div class="petugas-body">
-                            <div class="photo-switcher">
-                                <button type="button" class="photo-nav-btn" onclick="stepPetugas(1,-1)" aria-label="Petugas sebelumnya">&#9664;</button>
-                                <div class="photo-frame" id="photoFrame1">
-                                    <div class="scan-overlay"></div>
-                                    <div class="corner tl"></div><div class="corner tr"></div>
-                                    <div class="corner bl"></div><div class="corner br"></div>
-                                    <div class="photo-track-viewport">
-                                        <div class="photo-track" id="photoTrack1"></div>
-                                    </div>
-                                    <div class="shift-chip" id="chipShift1">PAGI</div>
+                            <div class="photo-frame" title="Ketuk foto untuk ganti petugas">
+                                <div class="scan-overlay"></div>
+                                <div class="corner tl"></div><div class="corner tr"></div>
+                                <div class="corner bl"></div><div class="corner br"></div>
+                                <img id="foto1" alt="" style="display:none;"
+                                     onload="this.style.display='block'; document.getElementById('placeholder1').style.display='none';"
+                                     onerror="this.style.display='none'; document.getElementById('placeholder1').style.display='flex';">
+                                <div class="photo-placeholder" id="placeholder1">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+                                        <circle cx="12" cy="8" r="4"/>
+                                        <path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7"/>
+                                    </svg>
+                                    <small>NO FOTO</small>
                                 </div>
-                                <button type="button" class="photo-nav-btn" onclick="stepPetugas(1,1)" aria-label="Petugas berikutnya">&#9654;</button>
+                                <div class="shift-chip" id="chipShift1">PAGI</div>
+                                <select id="p1" class="petugas-native-select" onchange="gen(); updateFoto(1);" aria-label="Pilih petugas dinas sebelumnya">
+                                    <option value="PELTU Alfried">PELTU Alfried</option>
+                                    <option value="SUKWAN Dian">SUKWAN Dian</option>
+                                    <option value="SUKWAN Jo">SUKWAN Jo</option>
+                                    <option value="SUKWAN Algie">SUKWAN Algie</option>
+                                </select>
                             </div>
-                            <select id="p1" style="display:none;" onchange="gen(); updateFoto(1); positionPhotoTrack(1, true);" aria-hidden="true" tabindex="-1" aria-label="Pilih petugas dinas sebelumnya">
-                                <option value="PELTU Alfried">PELTU Alfried</option>
-                                <option value="SUKWAN Dian">SUKWAN Dian</option>
-                                <option value="SUKWAN Jo">SUKWAN Jo</option>
-                                <option value="SUKWAN Algie">SUKWAN Algie</option>
-                            </select>
                             <div class="petugas-name-label" id="nameLabel1">PELTU Alfried</div>
+                            <div class="petugas-tap-hint">&#9679; ketuk foto u/ ganti</div>
                             <div class="petugas-fields">
                                 <div>
                                     <label>Shift</label>
@@ -944,26 +604,30 @@
                             <span class="petugas-badge">MENERIMA</span>
                         </div>
                         <div class="petugas-body">
-                            <div class="photo-switcher">
-                                <button type="button" class="photo-nav-btn" onclick="stepPetugas(2,-1)" aria-label="Petugas sebelumnya">&#9664;</button>
-                                <div class="photo-frame" id="photoFrame2">
-                                    <div class="scan-overlay"></div>
-                                    <div class="corner tl"></div><div class="corner tr"></div>
-                                    <div class="corner bl"></div><div class="corner br"></div>
-                                    <div class="photo-track-viewport">
-                                        <div class="photo-track" id="photoTrack2"></div>
-                                    </div>
-                                    <div class="shift-chip" id="chipShift2">SIANG</div>
+                            <div class="photo-frame" title="Ketuk foto untuk ganti petugas">
+                                <div class="scan-overlay"></div>
+                                <div class="corner tl"></div><div class="corner tr"></div>
+                                <div class="corner bl"></div><div class="corner br"></div>
+                                <img id="foto2" alt="" style="display:none;"
+                                     onload="this.style.display='block'; document.getElementById('placeholder2').style.display='none';"
+                                     onerror="this.style.display='none'; document.getElementById('placeholder2').style.display='flex';">
+                                <div class="photo-placeholder" id="placeholder2">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+                                        <circle cx="12" cy="8" r="4"/>
+                                        <path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7"/>
+                                    </svg>
+                                    <small>NO FOTO</small>
                                 </div>
-                                <button type="button" class="photo-nav-btn" onclick="stepPetugas(2,1)" aria-label="Petugas berikutnya">&#9654;</button>
+                                <div class="shift-chip" id="chipShift2">SIANG</div>
+                                <select id="p2" class="petugas-native-select" onchange="gen(); updateFoto(2);" aria-label="Pilih petugas dinas saat ini">
+                                    <option value="SUKWAN Dian">SUKWAN Dian</option>
+                                    <option value="PELTU Alfried">PELTU Alfried</option>
+                                    <option value="SUKWAN Jo">SUKWAN Jo</option>
+                                    <option value="SUKWAN Algie">SUKWAN Algie</option>
+                                </select>
                             </div>
-                            <select id="p2" style="display:none;" onchange="gen(); updateFoto(2); positionPhotoTrack(2, true);" aria-hidden="true" tabindex="-1" aria-label="Pilih petugas dinas saat ini">
-                                <option value="SUKWAN Dian">SUKWAN Dian</option>
-                                <option value="PELTU Alfried">PELTU Alfried</option>
-                                <option value="SUKWAN Jo">SUKWAN Jo</option>
-                                <option value="SUKWAN Algie">SUKWAN Algie</option>
-                            </select>
                             <div class="petugas-name-label" id="nameLabel2">SUKWAN Dian</div>
+                            <div class="petugas-tap-hint">&#9679; ketuk foto u/ ganti</div>
                             <div class="petugas-fields">
                                 <div>
                                     <label>Shift</label>
@@ -1181,30 +845,8 @@ var SHIFT_ORDER = ['Pagi', 'Siang', 'Malam'];
 /* ==========================================================
    FOTO PETUGAS
    ========================================================== */
-/* ==========================================================
-   CARA MENAMBAH / MENGGANTI FOTO PETUGAS (untuk kotak "Petugas Dinas"
-   maupun kotak "Jadwal Dinas Hari Ini" — keduanya memakai folder & nama
-   file yang sama, jadi cukup upload sekali):
-
-   1. Foto di-hosting di repo GitHub yang sama dengan file HTML ini
-      (mis. GitHub Pages), di dalam folder bernama  foto/
-   2. Nama file harus berupa "slug" dari nama lengkap petugas yang ada
-      di dropdown Petugas Dinas (p1/p2), yaitu: huruf kecil semua,
-      tanpa pangkat/gelar khusus karakter, spasi diganti "-".
-      Contoh: "PELTU Alfried"   -> foto/peltu-alfried.jpg
-              "SUKWAN Dian"     -> foto/sukwan-dian.jpg
-              "SUKWAN Jo"       -> foto/sukwan-jo.jpg
-              "SUKWAN Algie"    -> foto/sukwan-algie.jpg
-   3. Upload file .jpg tsb ke folder foto/ di repo GitHub (lewat web
-      GitHub: Add file > Upload files), lalu commit. Setelah live,
-      foto otomatis muncul baik di kotak Petugas Dinas maupun di
-      kotak Jadwal Dinas Hari Ini (karena namanya dicocokkan lewat
-      fotoSlugForNama() di bawah).
-   4. Kalau nama file tidak ditemukan / salah, otomatis fallback ke
-      ikon silhouette "NO FOTO" — tidak akan error.
-   ========================================================== */
 var FOTO_FOLDER = 'foto/';
-var FOTO_EXT = '.png';
+var FOTO_EXT = '.jpg';
 
 function slugNama(nama) {
     return nama
@@ -1214,146 +856,18 @@ function slugNama(nama) {
         .replace(/^-+|-+$/g, '');
 }
 
-/* Ambil nama depan (kata terakhir, mis. "SUKWAN Dian" -> "dian") supaya
-   nama dari jadwal dinas bisa dicocokkan dengan nama di kotak Petugas Dinas
-   walau formatnya beda (dengan/tanpa pangkat). */
-function firstNameOf(nama) {
-    var parts = String(nama || '').trim().split(/\s+/);
-    return parts.length ? parts[parts.length - 1].toLowerCase() : '';
-}
-
-/* Daftar petugas resmi diambil dari pilihan di kotak Petugas Dinas (p1 & p2)
-   supaya widget Jadwal Dinas selalu memakai foto yang sama persis. */
-function getPetugasList() {
-    var names = [];
-    ['p1', 'p2'].forEach(function (id) {
-        var sel = document.getElementById(id);
-        if (!sel) return;
-        Array.prototype.forEach.call(sel.options, function (opt) {
-            if (names.indexOf(opt.value) === -1) names.push(opt.value);
-        });
-    });
-    return names;
-}
-
-/* Cocokkan nama dari jadwal dinas dengan nama depan petugas di kotak
-   Petugas Dinas, lalu pakai foto petugas tsb (slug dari nama lengkapnya). */
-function fotoSlugForNama(nama) {
-    var target = firstNameOf(nama);
-    if (!target) return '';
-    var list = getPetugasList();
-    for (var i = 0; i < list.length; i++) {
-        if (firstNameOf(list[i]) === target) return slugNama(list[i]);
-    }
-    return slugNama(nama);
-}
-
 function updateFoto(n) {
     var nama = document.getElementById('p' + n).value;
     var shift = document.getElementById('s' + n).value;
+    var slug = slugNama(nama);
+
+    var img = document.getElementById('foto' + n);
+    img.alt = nama;
+    img.src = slug ? (FOTO_FOLDER + slug + FOTO_EXT) : '';
 
     document.getElementById('chipShift' + n).innerText = (shift || '').toUpperCase();
     var nameLabel = document.getElementById('nameLabel' + n);
     if (nameLabel) nameLabel.innerText = nama;
-    applyRealPhotoSize(n);
-}
-
-/* Terapkan ukuran & rasio ASLI foto (real size bawaan file), ditampilkan
-   1/3 dari ukuran aslinya, khusus tampilan PC. max-width dipakai (bukan
-   width mutlak) supaya kalau ruang kotak lebih sempit, foto ikut menyusut
-   proporsional tanpa memaksa kotak UI ikut melebar. */
-function applyRealPhotoSize(n) {
-    var frame = document.getElementById('photoFrame' + n);
-    if (!frame) return;
-    var isDesktop = window.matchMedia('(min-width: 1024px)').matches;
-    if (!isDesktop) {
-        frame.style.maxWidth = '';
-        frame.style.aspectRatio = '';
-        return;
-    }
-    var sel = document.getElementById('p' + n);
-    var track = document.getElementById('photoTrack' + n);
-    if (!sel || !track) return;
-    var idx = sel.selectedIndex;
-    if (idx < 0) idx = 0;
-    var slide = track.children[idx];
-    var img = slide ? slide.querySelector('img') : null;
-    if (img && img.naturalWidth && img.style.display !== 'none') {
-        frame.style.maxWidth = Math.round(img.naturalWidth / 3) + 'px';
-        frame.style.aspectRatio = img.naturalWidth + ' / ' + img.naturalHeight;
-    } else {
-        frame.style.maxWidth = '';
-        frame.style.aspectRatio = '';
-    }
-}
-window.addEventListener('resize', function () { applyRealPhotoSize(1); applyRealPhotoSize(2); });
-
-/* Bangun slide foto untuk tiap pilihan petugas di select p1/p2, satu slide
-   per orang, supaya bisa digeser (slide) dengan tombol panah kiri/kanan. */
-function buildPhotoSwitcher(n) {
-    var sel = document.getElementById('p' + n);
-    var track = document.getElementById('photoTrack' + n);
-    if (!sel || !track) return;
-    var html = '';
-    Array.prototype.forEach.call(sel.options, function (opt) {
-        var nama = opt.value;
-        var slug = slugNama(nama);
-        var namaAttr = String(nama).replace(/"/g, '&quot;');
-        html += '<div class="photo-slide">' +
-            '<img src="' + (slug ? FOTO_FOLDER + slug + FOTO_EXT : '') + '" alt="' + namaAttr + '" style="display:none;" ' +
-            'onload="this.style.display=\'block\'; this.nextElementSibling.style.display=\'none\'; applyRealPhotoSize(' + n + ');" ' +
-            'onerror="this.style.display=\'none\'; this.nextElementSibling.style.display=\'flex\'; applyRealPhotoSize(' + n + ');">' +
-            '<div class="photo-placeholder">' +
-            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">' +
-            '<circle cx="12" cy="8" r="4"/>' +
-            '<path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7"/>' +
-            '</svg>' +
-            '<small>NO FOTO</small>' +
-            '</div>' +
-            '</div>';
-    });
-    track.innerHTML = html;
-}
-
-/* Geser track foto ke posisi index petugas yang sedang dipilih. */
-function positionPhotoTrack(n, animate) {
-    var sel = document.getElementById('p' + n);
-    var track = document.getElementById('photoTrack' + n);
-    if (!sel || !track) return;
-    var idx = sel.selectedIndex;
-    if (idx < 0) idx = 0;
-    if (!animate) {
-        track.style.transition = 'none';
-        track.style.transform = 'translateX(-' + (idx * 100) + '%)';
-        void track.offsetWidth; /* paksa reflow supaya transition:none berlaku dulu */
-        track.style.transition = '';
-    } else {
-        track.style.transform = 'translateX(-' + (idx * 100) + '%)';
-    }
-}
-
-/* Ganti petugas dengan tombol panah kiri/kanan, foto slide, lalu glow saat berhenti. */
-var photoSettleTimers = {};
-function stepPetugas(n, dir) {
-    var sel = document.getElementById('p' + n);
-    var frame = document.getElementById('photoFrame' + n);
-    if (!sel) return;
-    var len = sel.options.length;
-    if (!len) return;
-    var idx = sel.selectedIndex;
-    if (idx < 0) idx = 0;
-    idx = (idx + dir + len) % len;
-    sel.selectedIndex = idx;
-
-    if (frame) frame.classList.remove('photo-settled');
-    positionPhotoTrack(n, true);
-    updateFoto(n);
-    gen();
-
-    clearTimeout(photoSettleTimers[n]);
-    photoSettleTimers[n] = setTimeout(function () {
-        if (frame) frame.classList.add('photo-settled');
-    }, 400);
 }
 
 /* ==========================================================
@@ -1444,247 +958,80 @@ function syncNow() {
 }
 
 /* ==========================================================
-   JADWAL DINAS - WIDGET BARU SEPERTI KOTAK PETUGAS
+   JADWAL DINAS — SPREADSHEET
    ========================================================== */
 var BULAN_JADWAL = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
-var JADWAL_API_URL = 'https://script.google.com/macros/s/AKfycbyD9YUV03H-51Dvdm0Lg-MGk9YgeWajMWQl2DAZyJ7hSyrhL-g6xCWV1Q0N9RrOMiuEgQ/exec';
-var jadwalDataCache = null;
-var statusDataCache = {};
-var jadwalFetchInFlight = false;
-
-// ===== Rentang jam tiap shift (harus sama dengan jadwal.html & informasi-radiologi.html) =====
-var SHIFT_RANGES = {
-    P: { start: 7 * 60,  end: 14 * 60 },   // Pagi  07.00–14.00
-    S: { start: 14 * 60, end: 21 * 60 },   // Siang/Sore 14.00–21.00
-    M: { start: 21 * 60, end: 7 * 60 }     // Malam 21.00–07.00 (lewat tengah malam)
-};
-
-// Menentukan fase dinas untuk sebuah slot shift (P/S/M) pada jam saat ini:
-// 'belum' (belum waktunya) | 'aktif' (sedang berjalan) | 'sudah' (sudah lewat)
-function getDutyPhase(shiftCode, nowMinutes) {
-    var range = SHIFT_RANGES[shiftCode];
-    if (!range) return 'unknown';
-    if (range.start <= range.end) {
-        if (nowMinutes < range.start) return 'belum';
-        if (nowMinutes < range.end) return 'aktif';
-        return 'sudah';
-    }
-    // Rentang yang melewati tengah malam (Malam)
-    if (nowMinutes >= range.start || nowMinutes < range.end) return 'aktif';
-    return 'belum';
-}
-
-/* Backend (Google Apps Script) menyimpan semua data sebagai key-value, dengan
-   value berupa string JSON (lihat remoteSet() di jadwal.html). GET tanpa
-   parameter key mengembalikan semua key sekaligus, mis:
-   { jadwalDinasData: "...json...", petugasStatus: "...json..." }.
-   Fungsi ini membongkar bentuk itu, dengan fallback ke bentuk lama (objek
-   jadwal langsung di top-level) supaya tetap kompatibel. */
-function extractJadwalAndStatus(raw) {
-    var jadwal = null, status = {};
-    if (!raw) return { jadwal: jadwal, status: status };
-
-    if (raw.jadwalDinasData !== undefined || raw.petugasStatus !== undefined) {
-        if (raw.jadwalDinasData) {
-            try { jadwal = typeof raw.jadwalDinasData === 'string' ? JSON.parse(raw.jadwalDinasData) : raw.jadwalDinasData; }
-            catch (e) { jadwal = null; }
-        }
-        if (raw.petugasStatus) {
-            try { status = typeof raw.petugasStatus === 'string' ? JSON.parse(raw.petugasStatus) : raw.petugasStatus; }
-            catch (e) { status = {}; }
-        }
-    } else if (raw.rows && raw.monthName) {
-        // Bentuk lama/fallback: respons langsung berupa objek jadwal
-        jadwal = raw;
-    }
-    return { jadwal: jadwal, status: status };
-}
-
 function getJadwalData() {
-    return jadwalDataCache;
+    try { return JSON.parse(localStorage.getItem('jadwalDinasData') || 'null'); }
+    catch (e) { return null; }
 }
 
-function fetchJadwalData() {
-    if (jadwalFetchInFlight) return Promise.resolve();
-    jadwalFetchInFlight = true;
-    return fetch(JADWAL_API_URL + (JADWAL_API_URL.indexOf('?') === -1 ? '?' : '&') + '_t=' + Date.now(), { cache: 'no-store' })
-        .then(function (res) {
-            if (!res.ok) throw new Error('HTTP ' + res.status);
-            return res.json();
-        })
-        .then(function (data) {
-            var extracted = extractJadwalAndStatus(data);
-            jadwalDataCache = extracted.jadwal;
-            statusDataCache = extracted.status;
-        })
-        .catch(function (err) {
-            console.error('Gagal mengambil data jadwal dari web app:', err);
-            jadwalDataCache = null;
-            statusDataCache = {};
-        })
-        .finally(function () {
-            jadwalFetchInFlight = false;
-            renderJadwalWidget();
-        });
-}
-
-function shiftRowsForDate(data, date) {
-    if (!data || !data.rows || !data.monthName) return null;
-    var monthIdx = BULAN_JADWAL.indexOf(data.monthName);
-    if (monthIdx === -1) return null;
-    if (date.getFullYear() !== Number(data.year) || date.getMonth() !== monthIdx) return null;
-    var dayNum = date.getDate();
-    if (dayNum < 1 || dayNum > Number(data.days)) return null;
-    return data.rows.map(function (r) {
-        var s = (r.shifts && r.shifts[dayNum - 1]) ? String(r.shifts[dayNum - 1]).toUpperCase() : '-';
-        return { name: r.name, shift: s };
-    });
-}
-
-function fmtTglSingkatJadwal(date) {
-    return String(date.getDate()).padStart(2, '0') + ' ' + BULAN_JADWAL[date.getMonth()].slice(0, 3);
-}
-
-function renderJadwalWidget() {
-    var grid = document.getElementById('jadwalPreviewGrid');
-    var otherGrid = document.getElementById('jadwalOtherDays');
+function renderJadwalSpreadsheet() {
+    var container = document.getElementById('jadwalSheetContainer');
     var tag = document.getElementById('jadwalStatusTag');
-    if (!grid || !otherGrid) return;
+    if (!container) return;
 
     var data = getJadwalData();
-    var now = getJakartaNow();
-    var kemarin = new Date(now); kemarin.setDate(now.getDate() - 1);
-    var besok = new Date(now); besok.setDate(now.getDate() + 1);
-    var lusa = new Date(now); lusa.setDate(now.getDate() + 2);
 
     if (tag) {
         if (data) { tag.textContent = 'LIVE'; tag.classList.remove('offline'); }
         else { tag.textContent = 'NO DATA'; tag.classList.add('offline'); }
     }
 
-    // Hari ini: tampilkan shift Pagi, Siang, Malam (3 kolom seperti petugas)
-    var todayRows = shiftRowsForDate(data, now);
-    var shiftOrder = ['P', 'S', 'M'];
-    var shiftLabels = { 'P': 'Pagi', 'S': 'Siang', 'M': 'Malam' };
-    var shiftColors = { 'P': 'sb-P', 'S': 'sb-S', 'M': 'sb-M' };
-    var currentShift = getCurrentShift();
-    var currentLabel = currentShift.charAt(0).toUpperCase();
-    var currentIdx = shiftOrder.indexOf(currentLabel);
-    var nowMinutesToday = now.getHours() * 60 + now.getMinutes();
-
-    var todayHtml = '';
-    if (todayRows && todayRows.length) {
-        var shiftMap = {};
-        todayRows.forEach(function(r) {
-            shiftMap[r.shift] = r.name;
-        });
-
-        todayHtml = shiftOrder.map(function(sh, shIdx) {
-            var name = shiftMap[sh] || '-';
-            var isLibur = (name === '-');
-            var phase = getDutyPhase(sh, nowMinutesToday); // 'belum' | 'aktif' | 'sudah'
-            var isActive = (sh === currentLabel) && phase === 'aktif';
-            /* "Tidak berdinas" = bukan shift yang sedang berjalan saat ini,
-               berlaku untuk shift sebelum maupun sesudahnya (bukan cuma yang sudah lewat). */
-            var isInactive = (!isLibur && !isActive);
-            var badgeClass = isLibur ? 'sb-L' : shiftColors[sh] || 'sb-default';
-            var nameDisplay = isLibur ? 'LIBUR' : name;
-            var slug = isLibur ? '' : fotoSlugForNama(nameDisplay);
-            var fotoSrc = (slug && !isLibur) ? (FOTO_FOLDER + slug + FOTO_EXT) : '';
-            var photoStateClass = isActive ? ' jadwal-photo-active' : (isInactive ? ' jadwal-photo-inactive' : '');
-
-            // Status kehadiran real-time (Belum Dinas / Di Tempat / Sedang Keluar / Sudah Dinas)
-            var statusPillHtml = '';
-            if (!isLibur) {
-                var isOut = !!(statusDataCache[name] && statusDataCache[name].keluar);
-                var pillClass, pillText;
-                if (phase === 'aktif') {
-                    pillClass = isOut ? 'js-out' : 'js-duty';
-                    pillText = isOut ? 'Sedang Keluar' : 'Di Tempat';
-                } else if (phase === 'belum') {
-                    pillClass = 'js-off'; pillText = 'Belum Dinas';
-                } else if (phase === 'sudah') {
-                    pillClass = 'js-off'; pillText = 'Sudah Dinas';
-                } else {
-                    pillClass = 'js-off'; pillText = '-';
-                }
-                statusPillHtml = '<span class="jadwal-status-pill ' + pillClass + '"><span class="dot"></span>' + pillText + '</span>';
-            }
-
-            return '<div class="jadwal-shift-card' +
-                (isActive ? ' jadwal-shift-active' : '') +
-                (isInactive ? ' jadwal-shift-inactive' : '') +
-                (isLibur ? ' jadwal-shift-libur' : '') +
-                '">' +
-                '<div class="jadwal-shift-head">' +
-                (isActive ? '<span class="jadwal-active-arrow">&#9660;</span>' : '') +
-                '<span class="jadwal-shift-label">' + shiftLabels[sh] + '</span>' +
-                '<span class="jadwal-shift-date">' + fmtTglSingkatJadwal(now) + '</span>' +
-                '</div>' +
-                '<div class="jadwal-shift-body">' +
-                '<div class="jadwal-photo-frame' + (isLibur ? ' jadwal-libur-frame' : '') + photoStateClass + '">' +
-                '<div class="scan-overlay-mini"></div>' +
-                '<div class="corner tl"></div><div class="corner tr"></div>' +
-                '<div class="corner bl"></div><div class="corner br"></div>' +
-                (fotoSrc ? '<img src="' + fotoSrc + '" alt="' + nameDisplay + '" onerror="this.style.display=\'none\'; this.nextElementSibling.style.display=\'flex\';">' : '') +
-                '<div class="photo-placeholder-mini" style="' + (fotoSrc ? 'display:none;' : '') + '">' +
-                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">' +
-                '<circle cx="12" cy="8" r="4"/>' +
-                '<path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7"/>' +
-                '</svg>' +
-                '<small>' + (isLibur ? 'LIBUR' : 'NO FOTO') + '</small>' +
-                '</div>' +
-                (isActive ? '<div class="radiasi-icon">&#9762;</div>' : '') +
-                '<div class="shift-chip-mini">' + (isLibur ? 'LIBUR' : shiftLabels[sh].toUpperCase()) + '</div>' +
-                '</div>' +
-                '<div class="jadwal-shift-name' + (isLibur ? ' libur' : '') + '">' + nameDisplay + '</div>' +
-                '<span class="jadwal-shift-badge-mini ' + badgeClass + '">' + (isLibur ? 'LIBUR' : sh) + '</span>' +
-                statusPillHtml +
-                '</div>' +
-                '</div>';
-        }).join('');
-    } else {
-        todayHtml = '<div class="jadwal-shift-card" style="grid-column:1/-1;padding:12px;text-align:center;">' +
-            '<div class="jadwal-empty">Belum ada data jadwal</div>' +
-            '</div>';
+    if (!data || !data.rows || !data.monthName) {
+        container.innerHTML = '<div class="jadwal-sheet-empty">Belum ada data jadwal. Silakan buat di halaman Jadwal.</div>';
+        return;
     }
 
-    grid.innerHTML = todayHtml;
+    var monthIndex = BULAN_JADWAL.indexOf(data.monthName);
+    if (monthIndex === -1) {
+        container.innerHTML = '<div class="jadwal-sheet-empty">Bulan jadwal tidak valid.</div>';
+        return;
+    }
 
-    // 3 hari lainnya: kemarin, besok, lusa (di bawah)
-    var otherDays = [kemarin, besok, lusa];
-    var otherLabels = ['KEMARIN', 'BESOK', 'LUSA'];
-    var otherHtml = otherDays.map(function(d, idx) {
-        var rows = shiftRowsForDate(data, d);
-        var body;
-        if (!rows || !rows.length) {
-            body = '<div class="jadwal-empty">-</div>';
-        } else {
-            var items = rows.map(function(r) {
-                var isLibur = (r.shift === '-');
-                var badgeClass = ['P', 'S', 'M', 'L'].indexOf(r.shift) !== -1 ? 'sb-' + r.shift : 'sb-default';
-                return '<div class="jadwal-shift-item' + (isLibur ? ' libur' : '') + '">' +
-                    '<span class="jadwal-shift-name">' + (isLibur ? '⚠️ ' : '') + r.name + '</span>' +
-                    '<span class="jadwal-shift-badge-mini ' + badgeClass + '">' + r.shift + '</span>' +
-                    '</div>';
-            });
-            body = items.join('');
-        }
-        return '<div class="jadwal-other-card' + (idx === 1 ? ' jadwal-besok-highlight' : '') + '">' +
-            '<div class="jadwal-shift-head">' +
-            '<span class="jadwal-shift-label">' + otherLabels[idx] + '</span>' +
-            '<span class="jadwal-shift-date">' + fmtTglSingkatJadwal(d) + '</span>' +
-            '</div>' +
-            '<div class="jadwal-shift-body">' + body + '</div>' +
-            '</div>';
-    }).join('');
+    var year = +data.year;
+    var daysInMonth = +data.days || new Date(year, monthIndex + 1, 0).getDate();
+    var refDate = +data.refDate || 0;
 
-    otherGrid.innerHTML = otherHtml;
+    // Judul & Subjudul
+    var titleHtml = '<div class="sheet-title">JADWAL DINAS - ' + data.monthName.toUpperCase() + ' ' + year + '</div>';
+    var subtitleHtml = '<div class="sheet-subtitle">Instalasi Radiologi / Keperawatan</div>';
+
+    // Header Tabel
+    var html = '<table class="jadwal-sheet"><thead><tr><th class="name-head">Nama Personel</th>';
+    for (var day = 1; day <= daysInMonth; day++) {
+        var dow = new Date(year, monthIndex, day).getDay();
+        var weekendClass = dow === 0 ? 'weekend-sun' : (dow === 6 ? 'weekend-sat' : '');
+        var refClass = day === refDate ? ' ref' : '';
+        html += '<th class="' + weekendClass + refClass + '" title="' + (day === refDate ? 'Tanggal referensi' : '') + '">' + day + '</th>';
+    }
+    html += '</tr></thead><tbody>';
+
+    // Baris Data
+    data.rows.forEach(function (row) {
+        html += '<tr><td class="name">' + escapeHtml(row.name) + '</td>';
+        (row.shifts || []).slice(0, daysInMonth).forEach(function (shift, idx) {
+            var s = shift || '-';
+            var bgClass = 'bg-' + s;
+            var refClass = (idx + 1 === refDate) ? ' ref' : '';
+            html += '<td class="' + bgClass + refClass + '">' + escapeHtml(s) + '</td>';
+        });
+        html += '</tr>';
+    });
+    html += '</tbody></table>';
+
+    container.innerHTML = titleHtml + subtitleHtml + html;
 }
 
 function openJadwalPage() {
     window.location.href = 'jadwal.html';
+}
+
+function escapeHtml(value) {
+    return String(value).replace(/[&<>"']/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
 }
 
 /* Posisikan widget: PC di atas Hasil Laporan, Mobile di atas Petugas Dinas */
@@ -1748,6 +1095,7 @@ function updateRowTotal(i) {
         return '<div class="kategori-card">' +
             '<div class="kategori-head">' +
             '<span class="kategori-name">' + k + '</span>' +
+            '<span class="kategori-total-badge" id="rowtotal-' + i + '">0 org</span>' +
             '</div>' +
             '<div class="sub-grid">' + boxes + '</div>' +
             '</div>';
@@ -1799,14 +1147,11 @@ function getLaporan() {
         var items = [], counts = 0;
         sub.forEach(function (s) {
             var v = parseInt(document.getElementById(s.replace(/\s+/g, '-') + '-' + i).value) || 0;
-            if (v > 0) { items.push('      -' + s + ' : ' + v + ' orang'); counts += v; }
+            if (v > 0) { items.push(v + ' orang (' + s + ')'); counts += v; }
         });
         total += counts;
-        if (items.length > 0) {
-            detail += (i + 1) + '. ' + k + '\n' + items.join('\n') + '\n';
-        } else {
-            detail += (i + 1) + '. ' + k + ' : nihil\n';
-        }
+        var ket = items.length > 0 ? items.join('\n                    ') : 'nihil';
+        detail += (i + 1) + '. ' + k.padEnd(14) + ': ' + ket + '\n';
     });
 
     return 'Kepada\nYth. Karumkit Tk. IV 12.07.03 Palangkaraya\n\n' + sf +
@@ -1816,19 +1161,9 @@ function getLaporan() {
         '\nRumkit TNI-AD dalam keadaan aman, sekian laporan selesai, Terimakasih.';
 }
 
-var lastCopiedLaporan = null;
-function updateCopyPulse(txt) {
-    var btn = document.querySelector('.btn-copy');
-    if (!btn) return;
-    if (lastCopiedLaporan !== txt) btn.classList.add('pulse-glow');
-    else btn.classList.remove('pulse-glow');
-}
-
 function gen() {
     updateDateWidget();
-    var txt = getLaporan();
-    document.getElementById('hasil-laporan').innerText = txt;
-    updateCopyPulse(txt);
+    document.getElementById('hasil-laporan').innerText = getLaporan();
 }
 
 function selAll() {
@@ -1951,9 +1286,6 @@ function deleteAplusan(idx) { var list = loadAplusan(); list.splice(idx, 1); sav
 function doKopi() {
     var txt = getLaporan();
     pushHistory();
-    lastCopiedLaporan = txt;
-    var copyBtn = document.querySelector('.btn-copy');
-    if (copyBtn) copyBtn.classList.remove('pulse-glow');
     if (navigator.clipboard && window.isSecureContext) {
         navigator.clipboard.writeText(txt).then(showToast);
     } else {
@@ -1982,14 +1314,8 @@ function doWA() {
    INISIALISASI
    ========================================================== */
 initDate();
-buildPhotoSwitcher(1);
-buildPhotoSwitcher(2);
-positionPhotoTrack(1, false);
-positionPhotoTrack(2, false);
 updateFoto(1);
 updateFoto(2);
-document.getElementById('photoFrame1').classList.add('photo-settled');
-document.getElementById('photoFrame2').classList.add('photo-settled');
 gen();
 syncNow();
 setInterval(syncNow, 1000);
@@ -2005,11 +1331,13 @@ setInterval(function () {
     }
 }, 300000);
 
-renderJadwalWidget();
+renderJadwalSpreadsheet();
 placeJadwalWidget();
 window.addEventListener('resize', placeJadwalWidget);
-fetchJadwalData();
-setInterval(fetchJadwalData, 60000);
+window.addEventListener('storage', function (e) {
+    if (e.key === 'jadwalDinasData') renderJadwalSpreadsheet();
+});
+setInterval(renderJadwalSpreadsheet, 60000);
 </script>
 </body>
 </html>
