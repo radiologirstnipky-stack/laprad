@@ -201,6 +201,9 @@
         overflow-y: hidden;
         max-height: 70vh;
         cursor: pointer;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior-x: contain;
+        scrollbar-width: thin;
         transition: border-color 0.25s ease, box-shadow 0.25s ease;
     }
     .jadwal-sheet-wrap:hover {
@@ -258,11 +261,17 @@
 
     .jadwal-sheet {
         border-collapse: collapse;
-        width: 100%;
+        width: max-content;
+        min-width: max-content;
         font-size: 11px;
         font-family: var(--font-mono);
         color: var(--text-main);
-        table-layout: fixed; /* Menjaga lebar kolom agar rapi */
+        table-layout: auto;
+    }
+    .jadwal-sheet th:not(.name-head),
+    .jadwal-sheet td:not(.name) {
+        min-width: 42px;
+        width: 42px;
     }
     .jadwal-sheet th,
     .jadwal-sheet td {
@@ -846,7 +855,7 @@ var SHIFT_ORDER = ['Pagi', 'Siang', 'Malam'];
    FOTO PETUGAS
    ========================================================== */
 var FOTO_FOLDER = 'foto/';
-var FOTO_EXT = '.jpg';
+var FOTO_EXT = '.png';
 
 function slugNama(nama) {
     return nama
@@ -856,14 +865,22 @@ function slugNama(nama) {
         .replace(/^-+|-+$/g, '');
 }
 
+var FOTO_PETUGAS = {
+    'PELTU Alfried': 'peltu-alfried.png',
+    'SUKWAN Algie': 'sukwan-algie.png',
+    'SUKWAN Dian': 'sukwan-dian.png',
+    'SUKWAN Jo': 'sukwan-jo.png'
+};
+
 function updateFoto(n) {
     var nama = document.getElementById('p' + n).value;
     var shift = document.getElementById('s' + n).value;
     var slug = slugNama(nama);
+    var fotoFile = FOTO_PETUGAS[nama] || (slug ? slug + FOTO_EXT : '');
 
     var img = document.getElementById('foto' + n);
     img.alt = nama;
-    img.src = slug ? (FOTO_FOLDER + slug + FOTO_EXT) : '';
+    img.src = fotoFile ? (FOTO_FOLDER + fotoFile) : '';
 
     document.getElementById('chipShift' + n).innerText = (shift || '').toUpperCase();
     var nameLabel = document.getElementById('nameLabel' + n);
@@ -1150,8 +1167,8 @@ function getLaporan() {
             if (v > 0) { items.push(v + ' orang (' + s + ')'); counts += v; }
         });
         total += counts;
-        var ket = items.length > 0 ? items.join('\n                    ') : 'nihil';
-        detail += (i + 1) + '. ' + k.padEnd(14) + ': ' + ket + '\n';
+        var ket = items.length > 0 ? ('\n                    - ' + items.join('\n                    - ')) : '\n                    - nihil';
+        detail += (i + 1) + '. ' + k.padEnd(14) + ':' + ket + '\n';
     });
 
     return 'Kepada\nYth. Karumkit Tk. IV 12.07.03 Palangkaraya\n\n' + sf +
