@@ -79,11 +79,17 @@
     }
     .app-wrap::before { content: ''; position: absolute; top: 0; left: 5%; right: 5%; height: 1px; background: linear-gradient(90deg, transparent, var(--primary), transparent); }
 
+    /* Cegah grid blowout pada layout desktop 2 kolom */
+    .panel-left, .panel-right { min-width: 0; }
+    .jadwal-widget, .jadwal-sheet-wrap { min-width: 0; }
+
     @media (max-width: 380px) { .app-wrap { padding: 12px; } .form-section, .pasien-table-wrap { padding: 10px; margin-bottom: 10px; } .header-title { font-size: 0.98rem; } .dt-num { font-size: 1.55rem; } .photo-frame { max-width: 58px; } .kategori-name { font-size: 0.62rem; } .kategori-total-badge { font-size: 0.56rem; padding: 2px 6px; } .sub-box { min-width: 70px; padding: 6px 4px; } .sub-label { font-size: 0.52rem; } .pc-btn { width: 20px; height: 20px; font-size: 0.8rem; } .pc-val { font-size: 0.68rem; } }
+
     @media (min-width: 1024px) {
         body { padding: 24px; align-items: center; }
         .app-wrap { max-width: 1680px; width: 96vw; padding: 32px 40px; margin: 0 auto; }
-        .main-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 40px; align-items: start; }
+        .main-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 40px; align-items: start; min-width: 0; }
+        .panel-left, .panel-right { min-width: 0; }
         .panel-right { position: sticky; top: 32px; }
         #hasil-laporan { font-size: 0.92rem; padding: 22px; }
         .header-title { font-size: 1.75rem; }
@@ -96,8 +102,35 @@
         .radio-digits { font-size: 1rem; }
         .shift-arrow-btn { width: 32px; height: 32px; font-size: 1.2rem; }
         .shift-value-display { font-size: 0.9rem; }
-        .jadwal-sheet { font-size: 0.78rem; }
-        .jadwal-sheet th, .jadwal-sheet td { padding: 6px 8px; }
+
+        /* ===== Preview Jadwal Dinas: perkecil & scrollable horizontal ===== */
+        .jadwal-widget.form-section { padding: 14px; margin-bottom: 14px; }
+        .jadwal-widget .section-title { margin-bottom: 8px; padding-bottom: 6px; }
+        .jadwal-sheet-wrap {
+            min-width: 0;
+            max-width: 100%;
+            max-height: 42vh;
+            padding: 8px;
+        }
+        .sheet-title { font-size: 0.88rem; margin-bottom: 2px; }
+        .sheet-subtitle { font-size: 0.58rem; margin-bottom: 8px; letter-spacing: 1px; }
+        .jadwal-sheet { font-size: 9px; }
+        .jadwal-sheet th:not(.name-head),
+        .jadwal-sheet td:not(.name) {
+            min-width: 24px;
+            width: 24px;
+            padding: 3px 1px;
+            font-size: 9px;
+        }
+        .jadwal-sheet th.name-head,
+        .jadwal-sheet td.name {
+            min-width: 110px;
+            max-width: 130px;
+            padding: 3px 6px;
+            font-size: 9.5px;
+        }
+        .jadwal-sheet th { padding-top: 4px; padding-bottom: 4px; }
+        .hover-overlay span { font-size: 7px; padding: 6px 10px; }
     }
     @media (min-width: 1440px) { .app-wrap { max-width: 1900px; } }
 
