@@ -184,6 +184,17 @@ function showToast(text){
   clearTimeout(showToast.timer); showToast.timer=setTimeout(()=>el.classList.add("hidden"),3500);
 }
 
+async function remoteGetAll(){
+  try{
+    const res=await fetch(SCRIPT_URL,{cache:"no-store"});
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    return await res.json();
+  }catch(e){
+    console.error("Gagal mengambil jadwal tersimpan:",e);
+    return null;
+  }
+}
+
 async function remoteSet(key,value){
   try{
     const res=await fetch(SCRIPT_URL,{
@@ -197,13 +208,14 @@ async function remoteSet(key,value){
   }
 }
 
-function init(){
+async function init(){
   const now=new Date(), m=document.getElementById("month"), y=document.getElementById("year");
   monthNames.forEach((name,i)=>m.add(new Option(name,i,i===now.getMonth(),i===now.getMonth())));
   for(let year=now.getFullYear()-1;year<=now.getFullYear()+2;year++)
     y.add(new Option(year,year,false,year===now.getFullYear()));
 
   const ex=document.getElementById("excluded-person");
+  ex.add(new Option("-- Tidak ada --",""));
   names.forEach(n=>ex.add(new Option(n,n)));
 
   document.querySelectorAll(".shift-select").forEach(s=>s.addEventListener("change",updateShiftSelects));
@@ -212,6 +224,104 @@ function init(){
 
   updateDateDropdown();
   updateShiftSelects();
+
+  // Tampilkan jadwal terakhir seketika dari cache lokal, lalu sinkronkan dengan server.
+  const cached=readSavedSchedule();
+  if(cached) loadScheduleIntoPreview(cached,true);
+
+  const all=await remoteGetAll();
+  if(all && all.jadwalDinasData){
+    try{
+      const serverData=typeof all.jadwalDinasData === "string" ? JSON.parse(all.jadwalDinasData) : all.jadwalDinasData;
+      if(serverData && serverData.rows) loadScheduleIntoPreview(serverData,false);
+    }catch(e){
+      console.error("Data jadwal server tidak valid:",e);
+    }
+  }
+}
+
+function readSavedSchedule(){
+  try{
+    const raw=localStorage.getItem("jadwalDinasData");
+    if(!raw) return null;
+    const data=JSON.parse(raw);
+    return data && data.rows ? data : null;
+  }catch(e){
+    return null;
+  }
+}
+
+function saveScheduleLocally(data){
+  localStorage.setItem("jadwalDinasData",JSON.stringify(data));
+}
+
+function getScheduleFormState(data){
+  const refDate=data.refDate || 1;
+  const refIndex=Math.max(0,refDate-1);
+  const byShift={P:null,S:null,M:null};
+  (data.rows||[]).forEach(row=>{
+    const shift=row.shifts && row.shifts[refIndex];
+    if(byShift.hasOwnProperty(shift)) byShift[shift]=row.name;
+  });
+  return {refDate,byShift};
+}
+
+function loadScheduleIntoPreview(data,fromCache=false){
+  if(!data || !Array.isArray(data.rows)) return;
+
+  // Simpan data yang benar-benar sedang ditampilkan agar tetap ada setelah refresh.
+  saveScheduleLocally(data);
+
+  const monthIndex=monthNames.indexOf(data.monthName);
+  if(monthIndex>=0) document.getElementById("month").value=monthIndex;
+  if(data.year) document.getElementById("year").value=data.year;
+  updateDateDropdown();
+
+  const form=getScheduleFormState(data);
+  if(form.refDate) document.getElementById("ref-date").value=form.refDate;
+
+  document.getElementById("shift-pagi").value=form.byShift.P || "";
+  document.getElementById("shift-sore").value=form.byShift.S || "";
+  document.getElementById("shift-malam").value=form.byShift.M || "";
+  updateShiftSelects();
+
+  document.getElementById("excluded-person").value=data.excluded || "";
+  document.getElementById("excluded-status").value=data.excludedStatus || "L";
+
+  renderSchedule(data);
+  document.getElementById("sync-status").textContent=fromCache
+    ? "✓ Jadwal tersimpan ditampilkan dari perangkat."
+    : "✓ Jadwal tersimpan dari Google Apps Script ditampilkan.";
+}
+
+function renderSchedule(data){
+  const monthIndex=monthNames.indexOf(data.monthName);
+  const month=monthIndex>=0 ? monthIndex : +document.getElementById("month").value;
+  const year=+data.year;
+  const daysInMonth=+data.days || new Date(year,month+1,0).getDate();
+  const refDate=+data.refDate || 0;
+
+  let html="<table><thead><tr><th class='name-head'>Nama Personel</th>";
+  for(let day=1;day<=daysInMonth;day++){
+    const dow=new Date(year,month,day).getDay();
+    const weekend=dow===0?"weekend-sun":dow===6?"weekend-sat":"";
+    const ref=day===refDate?" ref":"";
+    html+=`<th class="${weekend}${ref}" title="${day===refDate?"Tanggal referensi":""}">${day}</th>`;
+  }
+  html+="</tr></thead><tbody>";
+
+  (data.rows||[]).forEach(row=>{
+    html+=`<tr><td class="name">${escapeHtml(row.name)}</td>`;
+    (row.shifts||[]).slice(0,daysInMonth).forEach((shift,idx)=>{
+      html+=`<td class="shift-${shift}${idx+1===refDate?" ref":""}">${escapeHtml(shift)}</td>`;
+    });
+    html+="</tr>";
+  });
+  html+="</tbody></table>";
+
+  document.getElementById("table-container").innerHTML=html;
+  document.getElementById("title-month").textContent=`JADWAL DINAS - ${String(data.monthName||monthNames[month]).toUpperCase()} ${year}`;
+  document.getElementById("output-section").classList.remove("hidden");
 }
 
 function updateDateDropdown(){
@@ -263,22 +373,20 @@ function generateSchedule(){
   refOffsets[selected[2]]=startOffset.M;
   if(excluded) refOffsets[excluded]=startOffset[excludedStatus];
 
-  let html="<table><thead><tr><th class='name-head'>Nama Personel</th>";
-  for(let day=1;day<=daysInMonth;day++){
-    const dow=new Date(year,month,day).getDay();
-    const weekend=dow===0?"weekend-sun":dow===6?"weekend-sat":"";
-    const ref=day===refDate?" ref":"";
-    html+=`<th class="${weekend}${ref}" title="${day===refDate?"Tanggal referensi":""}">${day}</th>`;
-  }
-  html+="</tr></thead><tbody>";
-
-  const syncData={monthName:monthNames[month],year,days:daysInMonth,rows:[],excluded:excluded||null,excludedStatus:excluded?excludedStatus:null};
+  const syncData={
+    monthName:monthNames[month],
+    year,
+    days:daysInMonth,
+    refDate,
+    rows:[],
+    excluded:excluded||null,
+    excludedStatus:excluded?excludedStatus:null,
+    updatedAt:new Date().toISOString()
+  };
 
   names.forEach(name=>{
     const isExcluded=excluded===name;
-    html+=`<tr><td class="name">${escapeHtml(name)}</td>`;
     const row={name,shifts:[]};
-
     for(let day=1;day<=daysInMonth;day++){
       let shift;
       if(isExcluded){
@@ -289,30 +397,25 @@ function generateSchedule(){
         shift=shiftPattern[(day1Offset+(day-1))%8];
       }
       row.shifts.push(shift);
-      const label=shift==="C"?"C":shift;
-      html+=`<td class="shift-${shift}${day===refDate?" ref":""}">${label}</td>`;
     }
-    html+="</tr>";
     syncData.rows.push(row);
   });
 
-  html+="</tbody></table>";
-  document.getElementById("table-container").innerHTML=html;
-  document.getElementById("title-month").textContent=`JADWAL DINAS - ${monthNames[month].toUpperCase()} ${year}`;
-  document.getElementById("output-section").classList.remove("hidden");
-
-  const json=JSON.stringify(syncData);
-  localStorage.setItem("jadwalDinasData",json);
+  // Preview langsung diperbarui terlebih dahulu, kemudian data disimpan.
+  renderSchedule(syncData);
+  saveScheduleLocally(syncData);
 
   const btn=document.getElementById("generate-btn");
   const status=document.getElementById("sync-status");
   btn.disabled=true; btn.textContent="⏳ Menyinkronkan...";
-  status.textContent="Menyimpan jadwal ke Google Apps Script...";
+  status.textContent="Menyimpan jadwal terbaru...";
 
-  remoteSet("jadwalDinasData",json).then(ok=>{
+  remoteSet("jadwalDinasData",JSON.stringify(syncData)).then(ok=>{
     btn.disabled=false; btn.textContent="🔄 Buat Jadwal & Sinkronkan";
-    status.textContent=ok?"✓ Jadwal tersimpan dan tersinkron ke server.":"⚠️ Jadwal tersimpan di perangkat, tetapi sinkronisasi server gagal.";
-    if(!ok) showToast("Gagal sinkron ke Google Apps Script. Periksa koneksi atau SCRIPT_URL.");
+    status.textContent=ok
+      ? "✓ Jadwal terbaru tersimpan. Preview sudah diperbarui."
+      : "⚠️ Jadwal terbaru tersimpan di perangkat, tetapi sinkronisasi server gagal.";
+    if(!ok) showToast("Preview sudah diperbarui, tetapi gagal sinkron ke Google Apps Script.");
   });
 }
 
