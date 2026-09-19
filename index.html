@@ -27,6 +27,7 @@
         --amber:        #ffb445;
         --danger:       #ff6b6b;
         --info:         #5ac8ff;
+        --purple:       #c084fc;
         --radius-main:  20px;
         --radius-card:  14px;
         --radius-input: 8px;
@@ -78,11 +79,17 @@
     }
     .app-wrap::before { content: ''; position: absolute; top: 0; left: 5%; right: 5%; height: 1px; background: linear-gradient(90deg, transparent, var(--primary), transparent); }
 
+    /* Cegah grid blowout pada layout desktop 2 kolom */
+    .panel-left, .panel-right { min-width: 0; }
+    .jadwal-widget, .jadwal-sheet-wrap { min-width: 0; }
+
     @media (max-width: 380px) { .app-wrap { padding: 12px; } .form-section, .pasien-table-wrap { padding: 10px; margin-bottom: 10px; } .header-title { font-size: 0.98rem; } .dt-num { font-size: 1.55rem; } .photo-frame { max-width: 58px; } .kategori-name { font-size: 0.62rem; } .kategori-total-badge { font-size: 0.56rem; padding: 2px 6px; } .sub-box { min-width: 70px; padding: 6px 4px; } .sub-label { font-size: 0.52rem; } .pc-btn { width: 20px; height: 20px; font-size: 0.8rem; } .pc-val { font-size: 0.68rem; } }
+
     @media (min-width: 1024px) {
         body { padding: 24px; align-items: center; }
         .app-wrap { max-width: 1680px; width: 96vw; padding: 32px 40px; margin: 0 auto; }
-        .main-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 40px; align-items: start; }
+        .main-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 40px; align-items: start; min-width: 0; }
+        .panel-left, .panel-right { min-width: 0; }
         .panel-right { position: sticky; top: 32px; }
         #hasil-laporan { font-size: 0.92rem; padding: 22px; }
         .header-title { font-size: 1.75rem; }
@@ -95,8 +102,34 @@
         .radio-digits { font-size: 1rem; }
         .shift-arrow-btn { width: 32px; height: 32px; font-size: 1.2rem; }
         .shift-value-display { font-size: 0.9rem; }
-        .jadwal-sheet { font-size: 0.78rem; }
-        .jadwal-sheet th, .jadwal-sheet td { padding: 6px 8px; }
+
+        /* ===== Preview Jadwal Dinas: perkecil & scrollable horizontal ===== */
+        .jadwal-widget.form-section { padding: 14px; margin-bottom: 14px; }
+        .jadwal-widget .section-title { margin-bottom: 8px; padding-bottom: 6px; }
+        .jadwal-sheet-wrap {
+            min-width: 0;
+            max-width: 100%;
+            max-height: 42vh;
+            padding: 8px;
+        }
+        .sheet-title { font-size: 0.88rem; margin-bottom: 2px; }
+        .sheet-subtitle { font-size: 0.58rem; margin-bottom: 8px; letter-spacing: 1px; }
+        .jadwal-sheet { font-size: 9px; }
+        .jadwal-sheet th:not(.name-head),
+        .jadwal-sheet td:not(.name) {
+            min-width: 24px;
+            width: 24px;
+            padding: 3px 1px;
+            font-size: 9px;
+        }
+        .jadwal-sheet th.name-head,
+        .jadwal-sheet td.name {
+            min-width: 110px;
+            max-width: 130px;
+            padding: 3px 6px;
+            font-size: 9.5px;
+        }
+        .jadwal-sheet th { padding-top: 4px; padding-bottom: 4px; }
     }
     @media (min-width: 1440px) { .app-wrap { max-width: 1900px; } }
 
@@ -248,6 +281,161 @@
         padding: 5px 4px;
         white-space: nowrap;
     }
+    .jadwal-zoom-fixed-wrap {
+        position: relative;
+    }
+
+    .jadwal-sheet-wrap {
+        position: relative;
+        border: 1px solid var(--glass-border);
+        border-radius: var(--radius-card);
+        background: rgba(1, 8, 4, 0.7);
+        padding: 12px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        max-height: 70vh;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior-x: contain;
+        scrollbar-width: thin;
+        transition: border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+    .jadwal-sheet-wrap:hover {
+        border-color: var(--primary);
+        box-shadow: 0 0 20px rgba(89,255,166,0.15);
+    }
+
+    /* ===== TOMBOL KACA PEMBESAR (MAGNIFY) ===== */
+    /* Sekarang tombol ada di luar area scroll (.jadwal-zoom-fixed-wrap), jadi
+       posisinya tetap diam di pojok kanan-atas walau tabel digeser kiri/kanan. */
+    .jadwal-zoom-btn {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        z-index: 20;
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        border-radius: 50%;
+        border: 1px solid var(--primary);
+        background: rgba(1, 10, 5, 0.92);
+        color: var(--primary);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        box-shadow: 0 2px 10px rgba(0,0,0,0.55), 0 0 0 3px rgba(1,10,5,0.4);
+        transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+    }
+    .jadwal-zoom-btn:hover {
+        background: var(--primary);
+        color: var(--bg-from);
+        transform: scale(1.08);
+        box-shadow: 0 0 18px rgba(89,255,166,0.65), 0 0 0 3px rgba(89,255,166,0.25);
+    }
+    .jadwal-zoom-btn:active { transform: scale(0.94); }
+    .jadwal-zoom-btn:focus-visible { outline: 2px solid var(--glow); outline-offset: 2px; }
+    .jadwal-zoom-btn svg {
+        width: 16px;
+        height: 16px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        pointer-events: none;
+    }
+
+    /* ===== TOOLTIP POPUP DI ATAS KANAN ===== */
+    .jadwal-zoom-tooltip {
+        position: absolute;
+        top: 8px;
+        right: 48px;
+        z-index: 19;
+        font-family: var(--font-pixel);
+        font-size: 7px;
+        line-height: 1.4;
+        letter-spacing: 0.5px;
+        color: var(--primary);
+        background: rgba(1,10,5,0.96);
+        border: 1px solid var(--primary);
+        border-radius: 6px;
+        padding: 6px 9px;
+        white-space: nowrap;
+        opacity: 0;
+        transform: translateX(6px);
+        pointer-events: none;
+        transition: opacity 0.2s ease, transform 0.2s ease;
+        text-shadow: 0 0 8px rgba(89,255,166,0.55);
+        box-shadow: 0 4px 16px rgba(0,0,0,0.6), 0 0 12px rgba(89,255,166,0.25);
+    }
+    .jadwal-zoom-tooltip::after {
+        content: '';
+        position: absolute;
+        right: -4px;
+        top: 50%;
+        transform: translateY(-50%) rotate(45deg);
+        width: 7px;
+        height: 7px;
+        background: rgba(1,10,5,0.96);
+        border-right: 1px solid var(--primary);
+        border-top: 1px solid var(--primary);
+    }
+    .jadwal-zoom-btn:hover + .jadwal-zoom-tooltip,
+    .jadwal-zoom-btn:focus-visible + .jadwal-zoom-tooltip {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    @media (max-width: 1023px) {
+        .jadwal-zoom-tooltip { font-size: 6px; padding: 5px 7px; right: 46px; }
+        .jadwal-zoom-btn { width: 30px; height: 30px; }
+        .jadwal-zoom-btn svg { width: 15px; height: 15px; }
+    }
+
+    /* Gaya Spreadsheet */
+    .sheet-title {
+        text-align: center;
+        font-family: var(--font-display);
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text-main);
+        margin-bottom: 4px;
+        letter-spacing: 1px;
+    }
+    .sheet-subtitle {
+        text-align: center;
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        color: var(--text-muted);
+        margin-bottom: 12px;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+    }
+
+    .jadwal-sheet {
+        border-collapse: collapse;
+        width: max-content;
+        min-width: max-content;
+        font-size: 11px;
+        font-family: var(--font-mono);
+        color: var(--text-main);
+        table-layout: auto;
+    }
+    .jadwal-sheet th:not(.name-head),
+    .jadwal-sheet td:not(.name) {
+        min-width: 42px;
+        width: 42px;
+    }
+    .jadwal-sheet th,
+    .jadwal-sheet td {
+        border: 1px solid rgba(89,255,166,0.15);
+        text-align: center;
+        padding: 6px 4px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
     .jadwal-sheet th {
         background: rgba(89,255,166,0.12);
         font-weight: 800;
@@ -260,6 +448,9 @@
         left: 0;
         z-index: 4;
         background: rgba(89,255,166,0.18);
+        text-align: left;
+        min-width: 180px;
+        max-width: 200px;
     }
     .jadwal-sheet td.name {
         position: sticky;
@@ -281,6 +472,22 @@
     .jadwal-sheet .weekend-sat { background: rgba(255,180,69,0.08) !important; color: #ffb445; }
     .jadwal-sheet .weekend-sun { background: rgba(255,107,107,0.08) !important; color: #ff6b6b; }
     .jadwal-sheet .ref { outline: 2px solid var(--info); outline-offset: -2px; }
+        min-width: 180px;
+        max-width: 200px;
+        color: var(--text-main);
+        border-right: 2px solid rgba(89,255,166,0.3);
+    }
+
+    /* Warna Shift untuk Sel */
+    .jadwal-sheet .bg-P { background: rgba(255, 180, 69, 0.2); color: #ffb445; font-weight: 800; }
+    .jadwal-sheet .bg-S { background: rgba(255, 107, 107, 0.2); color: #ff6b6b; font-weight: 800; }
+    .jadwal-sheet .bg-M { background: rgba(89, 255, 166, 0.2); color: #59ffa6; font-weight: 800; }
+    .jadwal-sheet .bg-L { background: rgba(90, 200, 255, 0.2); color: #5ac8ff; font-weight: 800; }
+    .jadwal-sheet .bg-C { background: rgba(192, 132, 252, 0.2); color: #c084fc; font-weight: 800; }
+
+    /* Header Akhir Pekan */
+    .jadwal-sheet .weekend-sat { background: rgba(255, 180, 69, 0.15); color: #ffb445; }
+    .jadwal-sheet .weekend-sun { background: rgba(255, 107, 107, 0.15); color: #ff6b6b; }
 
     .jadwal-sheet-empty {
         text-align: center;
@@ -291,8 +498,10 @@
 
     @media (max-width: 380px) {
         .jadwal-sheet { font-size: 9px; }
-        .jadwal-sheet th, .jadwal-sheet td { padding: 3px 2px; }
-        .jadwal-sheet td.name { min-width: 100px; font-size: 9px; }
+        .jadwal-sheet th, .jadwal-sheet td { padding: 4px 2px; }
+        .jadwal-sheet th.name-head, .jadwal-sheet td.name { min-width: 120px; max-width: 140px; font-size: 9px; }
+        .sheet-title { font-size: 0.9rem; }
+        .sheet-subtitle { font-size: 0.55rem; }
     }
 
     .pasien-table-wrap { padding: 14px; }
@@ -495,9 +704,19 @@
                     <span class="dot"></span><span class="st-text">Jadwal Dinas Bulan Ini</span>
                     <span class="jadwal-status-tag" id="jadwalStatusTag">LIVE</span>
                 </div>
-                <div class="jadwal-sheet-wrap" id="jadwalSheetWrap" onclick="openJadwalPage()">
-                    <div class="hover-overlay"><span>📅 Klik untuk buka halaman jadwal lengkap</span></div>
-                    <div id="jadwalSheetContainer"></div>
+                <div class="jadwal-zoom-fixed-wrap">
+                    <div class="jadwal-sheet-wrap" id="jadwalSheetWrap">
+                        <div id="jadwalSheetContainer"></div>
+                    </div>
+                    <button type="button" class="jadwal-zoom-btn" onclick="openJadwalPage()" aria-label="Buka halaman jadwal lengkap" title="">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <circle cx="11" cy="11" r="7"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            <line x1="11" y1="8" x2="11" y2="14"></line>
+                            <line x1="8" y1="11" x2="14" y2="11"></line>
+                        </svg>
+                    </button>
+                    <div class="jadwal-zoom-tooltip" role="tooltip">📅 Buka halaman jadwal lengkap</div>
                 </div>
             </div>
 
@@ -813,7 +1032,7 @@ var SHIFT_ORDER = ['Pagi', 'Siang', 'Malam'];
    FOTO PETUGAS
    ========================================================== */
 var FOTO_FOLDER = 'foto/';
-var FOTO_EXT = '.jpg';
+var FOTO_EXT = '.png';
 
 function slugNama(nama) {
     return nama
@@ -823,14 +1042,22 @@ function slugNama(nama) {
         .replace(/^-+|-+$/g, '');
 }
 
+var FOTO_PETUGAS = {
+    'PELTU Alfried': 'peltu-alfried.png',
+    'SUKWAN Algie': 'sukwan-algie.png',
+    'SUKWAN Dian': 'sukwan-dian.png',
+    'SUKWAN Jo': 'sukwan-jo.png'
+};
+
 function updateFoto(n) {
     var nama = document.getElementById('p' + n).value;
     var shift = document.getElementById('s' + n).value;
     var slug = slugNama(nama);
+    var fotoFile = FOTO_PETUGAS[nama] || (slug ? slug + FOTO_EXT : '');
 
     var img = document.getElementById('foto' + n);
     img.alt = nama;
-    img.src = slug ? (FOTO_FOLDER + slug + FOTO_EXT) : '';
+    img.src = fotoFile ? (FOTO_FOLDER + fotoFile) : '';
 
     document.getElementById('chipShift' + n).innerText = (shift || '').toUpperCase();
     var nameLabel = document.getElementById('nameLabel' + n);
@@ -961,26 +1188,34 @@ function renderJadwalSpreadsheet() {
     var daysInMonth = +data.days || new Date(year, monthIndex + 1, 0).getDate();
     var refDate = +data.refDate || 0;
 
+    // Judul & Subjudul
+    var titleHtml = '<div class="sheet-title">JADWAL DINAS - ' + data.monthName.toUpperCase() + ' ' + year + '</div>';
+    var subtitleHtml = '<div class="sheet-subtitle">Instalasi Radiologi / Keperawatan</div>';
+
+    // Header Tabel
     var html = '<table class="jadwal-sheet"><thead><tr><th class="name-head">Nama Personel</th>';
     for (var day = 1; day <= daysInMonth; day++) {
         var dow = new Date(year, monthIndex, day).getDay();
-        var weekend = dow === 0 ? 'weekend-sun' : dow === 6 ? 'weekend-sat' : '';
-        var ref = day === refDate ? ' ref' : '';
-        html += '<th class="' + weekend + ref + '" title="' + (day === refDate ? 'Tanggal referensi' : '') + '">' + day + '</th>';
+        var weekendClass = dow === 0 ? 'weekend-sun' : (dow === 6 ? 'weekend-sat' : '');
+        var refClass = day === refDate ? ' ref' : '';
+        html += '<th class="' + weekendClass + refClass + '" title="' + (day === refDate ? 'Tanggal referensi' : '') + '">' + day + '</th>';
     }
     html += '</tr></thead><tbody>';
 
+    // Baris Data
     data.rows.forEach(function (row) {
         html += '<tr><td class="name">' + escapeHtml(row.name) + '</td>';
         (row.shifts || []).slice(0, daysInMonth).forEach(function (shift, idx) {
             var s = shift || '-';
-            html += '<td class="shift-' + s + (idx + 1 === refDate ? ' ref' : '') + '">' + escapeHtml(s) + '</td>';
+            var bgClass = 'bg-' + s;
+            var refClass = (idx + 1 === refDate) ? ' ref' : '';
+            html += '<td class="' + bgClass + refClass + '">' + escapeHtml(s) + '</td>';
         });
         html += '</tr>';
     });
     html += '</tbody></table>';
 
-    container.innerHTML = html;
+    container.innerHTML = titleHtml + subtitleHtml + html;
 }
 
 function openJadwalPage() {
@@ -1106,11 +1341,14 @@ function getLaporan() {
         var items = [], counts = 0;
         sub.forEach(function (s) {
             var v = parseInt(document.getElementById(s.replace(/\s+/g, '-') + '-' + i).value) || 0;
-            if (v > 0) { items.push(v + ' orang (' + s + ')'); counts += v; }
+            if (v > 0) { items.push(s + ' : ' + v + ' orang'); counts += v; }
         });
         total += counts;
-        var ket = items.length > 0 ? items.join('\n                    ') : 'nihil';
-        detail += (i + 1) + '. ' + k.padEnd(14) + ': ' + ket + '\n';
+        if (items.length > 0) {
+            detail += (i + 1) + '. ' + k + ' :\n    - ' + items.join('\n    - ') + '\n';
+        } else {
+            detail += (i + 1) + '. ' + k + ' : nihil\n';
+        }
     });
 
     return 'Kepada\nYth. Karumkit Tk. IV 12.07.03 Palangkaraya\n\n' + sf +
